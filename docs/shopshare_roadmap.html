@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopShare — Roadmap de Desenvolvimento</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Clash+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2eb;
+    --paper: #faf8f3;
+    --ink: #1a1810;
+    --ink2: #3d3a30;
+    --muted: #9a9485;
+    --border: #ddd8cc;
+    --phase1: #c8460a;
+    --phase2: #1a6b3a;
+    --phase3: #1b4f8a;
+    --phase4: #7a2d8c;
+    --phase5: #8a5a00;
+    --phase6: #2d6b6b;
+    --mono: 'IBM Plex Mono', monospace;
+    --display: 'Clash Display', 'Syne', sans-serif;
+    --done-bg: #e8f5ed;
+    --done-border: #b8dfc5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--mono);
+    min-height: 100vh;
+    padding: 48px 24px 80px;
+  }
+
+  /* Grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.5;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 48px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 24px;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .title-block h1 {
+    font-family: var(--display);
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .title-block h1 em {
+    font-style: normal;
+    color: var(--phase1);
+  }
+
+  .title-block p {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .progress-block {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .progress-number {
+    font-family: var(--display);
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .progress-number span {
+    font-size: 18px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .progress-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .progress-bar-wrap {
+    width: 200px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 8px;
+    margin-left: auto;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--phase2);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Phase */
+  .phase {
+    margin-bottom: 36px;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .phase-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .phase-title-wrap { flex: 1; }
+
+  .phase-title {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  .phase-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 3px;
+  }
+
+  .phase-time {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .phase-count {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .phase-toggle {
+    font-size: 12px;
+    color: var(--muted);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .phase.collapsed .phase-toggle { transform: rotate(-90deg); }
+
+  /* Tasks */
+  .tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .phase.collapsed .tasks { display: none; }
+
+  .task {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: start;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .task:hover { border-color: var(--ink2); }
+
+  .task.done {
+    background: var(--done-bg);
+    border-color: var(--done-border);
+  }
+
+  .task.done .task-title { text-decoration: line-through; color: var(--muted); }
+  .task.done .task-desc { opacity: 0.5; }
+
+  .task-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.15s;
+    background: white;
+  }
+
+  .task.done .task-check {
+    border-color: var(--phase2);
+    background: var(--phase2);
+  }
+
+  .task-check-icon {
+    font-size: 11px;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .task.done .task-check-icon { opacity: 1; }
+
+  .task-body { min-width: 0; }
+
+  .task-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+    transition: color 0.15s;
+  }
+
+  .task-desc {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 5px;
+    line-height: 1.6;
+    transition: opacity 0.15s;
+  }
+
+  .task-desc code {
+    font-family: var(--mono);
+    background: rgba(0,0,0,0.06);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 10px;
+    color: var(--ink2);
+  }
+
+  .task-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+  }
+
+  .tag {
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.05);
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .task-num {
+    font-size: 10px;
+    color: var(--border);
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-top: 3px;
+    font-family: var(--display);
+  }
+
+  /* Subtasks */
+  .subtasks {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .subtask {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 3px 0;
+    transition: color 0.15s;
+  }
+
+  .subtask:hover { color: var(--ink); }
+
+  .subtask.done { color: var(--muted); text-decoration: line-through; opacity: 0.6; }
+
+  .sub-check {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: white;
+    transition: all 0.15s;
+    font-size: 8px;
+    color: white;
+  }
+
+  .subtask.done .sub-check {
+    background: var(--phase2);
+    border-color: var(--phase2);
+  }
+
+  /* Connector line between phases */
+  .phase-connector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: -20px 0 20px 17px;
+    font-size: 10px;
+    color: var(--border);
+    letter-spacing: 1px;
+  }
+
+  .connector-line {
+    width: 2px;
+    height: 20px;
+    background: var(--border);
+    border-radius: 1px;
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--ink);
+    color: white;
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    z-index: 50;
+    border-top: 3px solid var(--phase1);
+  }
+
+  .stat { display: flex; align-items: center; gap: 8px; }
+  .stat-val { font-family: var(--display); font-size: 18px; font-weight: 700; }
+  .stat-label { color: rgba(255,255,255,0.4); text-transform: uppercase; font-size: 9px; }
+
+  .reset-btn {
+    margin-left: auto;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.5);
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+
+  @media (max-width: 600px) {
+    .progress-number { font-size: 36px; }
+    .title-block h1 { font-size: 32px; }
+    .stats-bar { gap: 16px; padding: 10px 16px; }
+    .stat-val { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-top">
+      <div class="title-block">
+        <h1>Shop<em>Share</em><br>Roadmap</h1>
+        <p>Flutter + Dart Frog — Do zero ao WebSocket</p>
+      </div>
+      <div class="progress-block">
+        <div class="progress-number"><span id="done-count">0</span><span> / <span id="total-count">0</span></span></div>
+        <div class="progress-label">tarefas concluídas</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--phase1)"></div> Fase 1 — Setup</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--phase2)"></div> Fase 2 — Banco</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--phase3)"></div> Fase 3 — API REST</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--phase4)"></div> Fase 4 — Flutter</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--phase5)"></div> Fase 5 — WebSocket</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--phase6)"></div> Fase 6 — Finalização</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ -->
+  <!-- FASE 1 — SETUP                  -->
+  <!-- ═══════════════════════════════ -->
+  <div class="phase" id="phase-1">
+    <div class="phase-header" onclick="togglePhase('phase-1')">
+      <div class="phase-number" style="background:var(--phase1)">1</div>
+      <div class="phase-title-wrap">
+        <div class="phase-title">Repositório & Ambiente</div>
+        <div class="phase-meta">
+          <span class="phase-time">⏱ ~2h</span>
+          <span class="phase-count" style="background:rgba(200,70,10,0.1);color:var(--phase1)" id="count-phase-1">— tarefas</span>
+        </div>
+      </div>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="tasks">
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar repositório no GitHub</div>
+          <div class="task-desc">Crie um repositório público ou privado chamado <code>shopshare</code>. Inicialize com README e adicione um <code>.gitignore</code> para Dart. Configure a branch <code>main</code> como padrão.</div>
+          <div class="task-tags"><span class="tag">git</span><span class="tag">github</span></div>
+        </div>
+        <div class="task-num">#01</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Estrutura de monorepo — duas pastas principais</div>
+          <div class="task-desc">Crie as pastas <code>backend/</code> (Dart Frog) e <code>app/</code> (Flutter) na raiz do repositório. Adicione um <code>README.md</code> explicando cada pasta.</div>
+          <div class="task-tags"><span class="tag">estrutura</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Criar pasta <code>backend/</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Criar pasta <code>app/</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>README na raiz do monorepo</div>
+          </div>
+        </div>
+        <div class="task-num">#02</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Instalar Flutter SDK e configurar ambiente</div>
+          <div class="task-desc">Instale o Flutter SDK (versão estável). Rode <code>flutter doctor</code> e resolva todos os problemas listados. Configure emulador Android ou iOS para testes.</div>
+          <div class="task-tags"><span class="tag">flutter</span><span class="tag">sdk</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Instalar Flutter SDK</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Rodar <code>flutter doctor</code> sem erros</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Configurar emulador ou dispositivo físico</div>
+          </div>
+        </div>
+        <div class="task-num">#03</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Instalar Dart Frog CLI</div>
+          <div class="task-desc">Instale o Dart Frog globalmente via <code>dart pub global activate dart_frog_cli</code>. Verifique a instalação com <code>dart_frog --version</code>.</div>
+          <div class="task-tags"><span class="tag">dart frog</span><span class="tag">cli</span></div>
+        </div>
+        <div class="task-num">#04</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar projeto Dart Frog na pasta backend/</div>
+          <div class="task-desc">Dentro de <code>backend/</code>, execute <code>dart_frog create .</code> para criar o projeto. Teste com <code>dart_frog dev</code> e acesse <code>localhost:8080</code> para confirmar que está funcionando.</div>
+          <div class="task-tags"><span class="tag">dart frog</span><span class="tag">setup</span></div>
+        </div>
+        <div class="task-num">#05</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar projeto Flutter na pasta app/</div>
+          <div class="task-desc">Dentro de <code>app/</code>, execute <code>flutter create . --org com.shopshare --project-name shopshare</code>. Rode <code>flutter run</code> para confirmar que sobe no emulador.</div>
+          <div class="task-tags"><span class="tag">flutter</span><span class="tag">setup</span></div>
+        </div>
+        <div class="task-num">#06</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Configurar Docker para o banco PostgreSQL local</div>
+          <div class="task-desc">Crie um arquivo <code>docker-compose.yml</code> na raiz com um serviço PostgreSQL (imagem <code>postgres:16</code>). Defina variáveis de ambiente: <code>POSTGRES_DB=shopshare</code>, <code>POSTGRES_USER</code>, <code>POSTGRES_PASSWORD</code>. Suba com <code>docker compose up -d</code>.</div>
+          <div class="task-tags"><span class="tag">docker</span><span class="tag">postgresql</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Criar <code>docker-compose.yml</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Subir container com <code>docker compose up -d</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Verificar conexão com <code>psql</code> ou DBeaver</div>
+          </div>
+        </div>
+        <div class="task-num">#07</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Configurar arquivo .env no backend</div>
+          <div class="task-desc">Crie um <code>.env</code> com as variáveis <code>DATABASE_URL</code>, <code>JWT_SECRET</code>, <code>PORT</code>. Adicione <code>.env</code> ao <code>.gitignore</code>. Crie um <code>.env.example</code> com os nomes das variáveis (sem valores) para guiar outros devs.</div>
+          <div class="task-tags"><span class="tag">config</span><span class="tag">segurança</span></div>
+        </div>
+        <div class="task-num">#08</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="phase-connector"><div class="connector-line"></div></div>
+
+  <!-- ═══════════════════════════════ -->
+  <!-- FASE 2 — BANCO DE DADOS         -->
+  <!-- ═══════════════════════════════ -->
+  <div class="phase" id="phase-2">
+    <div class="phase-header" onclick="togglePhase('phase-2')">
+      <div class="phase-number" style="background:var(--phase2)">2</div>
+      <div class="phase-title-wrap">
+        <div class="phase-title">Banco de Dados & Migrations</div>
+        <div class="phase-meta">
+          <span class="phase-time">⏱ ~3h</span>
+          <span class="phase-count" style="background:rgba(26,107,58,0.1);color:var(--phase2)" id="count-phase-2">— tarefas</span>
+        </div>
+      </div>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="tasks">
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Adicionar pacote drift ao backend</div>
+          <div class="task-desc">No <code>pubspec.yaml</code> do backend, adicione <code>drift</code>, <code>drift_dev</code>, <code>postgres</code> e <code>build_runner</code> como dependências. Rode <code>dart pub get</code>.</div>
+          <div class="task-tags"><span class="tag">drift</span><span class="tag">orm</span></div>
+        </div>
+        <div class="task-num">#09</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar tabelas no Drift — users e categories</div>
+          <div class="task-desc">Crie o arquivo <code>database/tables/users.dart</code> e <code>categories.dart</code> definindo as colunas conforme a modelagem. A tabela <code>categories</code> é estática (pré-populada com dados seed).</div>
+          <div class="task-tags"><span class="tag">drift</span><span class="tag">schema</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Definir tabela <code>users</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Definir tabela <code>categories</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Criar seed com 8–10 categorias padrão</div>
+          </div>
+        </div>
+        <div class="task-num">#10</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar tabelas — lists e list_members</div>
+          <div class="task-desc">Crie <code>lists.dart</code> com o campo <code>share_code</code> único (CHAR 6). Crie <code>list_members.dart</code> como tabela de junção entre users e lists, com o campo <code>role</code> (owner/member).</div>
+          <div class="task-tags"><span class="tag">drift</span><span class="tag">schema</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Definir tabela <code>lists</code> com <code>share_code UNIQUE</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Definir tabela <code>list_members</code> com FK dupla</div>
+          </div>
+        </div>
+        <div class="task-num">#11</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar tabelas — items e item_history</div>
+          <div class="task-desc">Crie <code>items.dart</code> com todas as colunas conforme modelagem (incluindo <code>checked_by</code> nullable). Crie <code>item_history.dart</code> para rastrear frequência de itens por lista.</div>
+          <div class="task-tags"><span class="tag">drift</span><span class="tag">schema</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Definir tabela <code>items</code> completa</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Definir tabela <code>item_history</code></div>
+          </div>
+        </div>
+        <div class="task-num">#12</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Gerar código do Drift com build_runner</div>
+          <div class="task-desc">Rode <code>dart run build_runner build</code> para gerar os arquivos <code>.g.dart</code> com os DAOs e queries tipados. Confirme que não há erros de geração.</div>
+          <div class="task-tags"><span class="tag">codegen</span></div>
+        </div>
+        <div class="task-num">#13</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar classe AppDatabase e conectar ao PostgreSQL</div>
+          <div class="task-desc">Crie <code>database/app_database.dart</code> que instancia o banco usando as variáveis do <code>.env</code>. Implemente como singleton usando o middleware do Dart Frog para injeção de dependência.</div>
+          <div class="task-tags"><span class="tag">drift</span><span class="tag">di</span></div>
+        </div>
+        <div class="task-num">#14</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar DAOs (Data Access Objects) para cada entidade</div>
+          <div class="task-desc">Crie um DAO por entidade: <code>UsersDao</code>, <code>ListsDao</code>, <code>ItemsDao</code>. Cada DAO deve ter os métodos básicos: insert, findById, update, delete. Use queries tipadas do Drift.</div>
+          <div class="task-tags"><span class="tag">dao</span><span class="tag">drift</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Criar <code>UsersDao</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Criar <code>ListsDao</code> com query por <code>share_code</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Criar <code>ItemsDao</code> com query de itens por lista</div>
+          </div>
+        </div>
+        <div class="task-num">#15</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Testar conexão e operações básicas no banco</div>
+          <div class="task-desc">Escreva um script de teste em <code>test/database_test.dart</code> que insere um usuário, cria uma lista, adiciona um item e verifica os dados. Rode com <code>dart test</code>.</div>
+          <div class="task-tags"><span class="tag">teste</span><span class="tag">validação</span></div>
+        </div>
+        <div class="task-num">#16</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="phase-connector"><div class="connector-line"></div></div>
+
+  <!-- ═══════════════════════════════ -->
+  <!-- FASE 3 — API REST               -->
+  <!-- ═══════════════════════════════ -->
+  <div class="phase" id="phase-3">
+    <div class="phase-header" onclick="togglePhase('phase-3')">
+      <div class="phase-number" style="background:var(--phase3)">3</div>
+      <div class="phase-title-wrap">
+        <div class="phase-title">API REST com Dart Frog</div>
+        <div class="phase-meta">
+          <span class="phase-time">⏱ ~5h</span>
+          <span class="phase-count" style="background:rgba(27,79,138,0.1);color:var(--phase3)" id="count-phase-3">— tarefas</span>
+        </div>
+      </div>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="tasks">
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar middleware de injeção do banco de dados</div>
+          <div class="task-desc">Crie <code>middleware/database_middleware.dart</code> que injeta a instância do <code>AppDatabase</code> no contexto de cada request usando <code>provider()</code> do Dart Frog. Aplique na raiz das rotas.</div>
+          <div class="task-tags"><span class="tag">middleware</span><span class="tag">di</span></div>
+        </div>
+        <div class="task-num">#17</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar middleware de CORS</div>
+          <div class="task-desc">Crie <code>middleware/cors_middleware.dart</code> para permitir requisições do app Flutter durante o desenvolvimento. Configure os headers <code>Access-Control-Allow-Origin</code>, <code>Allow-Methods</code> e <code>Allow-Headers</code>.</div>
+          <div class="task-tags"><span class="tag">middleware</span><span class="tag">cors</span></div>
+        </div>
+        <div class="task-num">#18</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Implementar rota POST /api/users</div>
+          <div class="task-desc">Crie <code>routes/api/users/index.dart</code>. Recebe <code>display_name</code>, <code>avatar_emoji</code> e <code>device_token</code>. Gera UUID, salva no banco e retorna o usuário criado com status 201.</div>
+          <div class="task-tags"><span class="tag">rest</span><span class="tag">users</span></div>
+        </div>
+        <div class="task-num">#19</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Implementar rota POST /api/lists</div>
+          <div class="task-desc">Crie a rota para criar uma nova lista. Gere automaticamente o <code>share_code</code> de 6 caracteres alfanuméricos únicos. Cadastre o criador como membro com role <code>owner</code> na tabela <code>list_members</code>.</div>
+          <div class="task-tags"><span class="tag">rest</span><span class="tag">lists</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Implementar geração do share_code único</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Salvar lista e membro (owner) em transação</div>
+          </div>
+        </div>
+        <div class="task-num">#20</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Implementar rota GET /api/lists/:id</div>
+          <div class="task-desc">Retorna detalhes completos da lista: dados da lista + array de membros + array de itens com categoria e quem adicionou. Use JOIN no Drift para montar o response em uma query eficiente.</div>
+          <div class="task-tags"><span class="tag">rest</span><span class="tag">lists</span></div>
+        </div>
+        <div class="task-num">#21</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Implementar rota POST /api/lists/join</div>
+          <div class="task-desc">Recebe <code>share_code</code> e <code>user_id</code>. Busca a lista pelo código. Verifica se o usuário já é membro. Se não for, insere em <code>list_members</code> com role <code>member</code>. Retorna o <code>list_id</code>.</div>
+          <div class="task-tags"><span class="tag">rest</span><span class="tag">lists</span></div>
+        </div>
+        <div class="task-num">#22</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Implementar rota PATCH /api/lists/:id</div>
+          <div class="task-desc">Permite renomear a lista ou marcar como arquivada. Somente o <code>owner</code> pode realizar essas ações — valide o <code>user_id</code> enviado no body contra o <code>owner_id</code> da lista.</div>
+          <div class="task-tags"><span class="tag">rest</span><span class="tag">lists</span></div>
+        </div>
+        <div class="task-num">#23</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Implementar rota POST /api/lists/:listId/items</div>
+          <div class="task-desc">Adiciona um item à lista. Valide que o usuário é membro da lista antes de inserir. Após inserir, atualize (ou crie) o registro em <code>item_history</code> incrementando <code>times_added</code>.</div>
+          <div class="task-tags"><span class="tag">rest</span><span class="tag">items</span></div>
+        </div>
+        <div class="task-num">#24</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Implementar rota PATCH /api/items/:id/check</div>
+          <div class="task-desc">Marca ou desmarca um item. Atualiza <code>is_checked</code>, <code>checked_by</code> e <code>checked_at</code>. Ao desmarcar, zere <code>checked_by</code> e <code>checked_at</code> para null.</div>
+          <div class="task-tags"><span class="tag">rest</span><span class="tag">items</span></div>
+        </div>
+        <div class="task-num">#25</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Implementar rota DELETE /api/items/:id</div>
+          <div class="task-desc">Remove o item da lista. Valide que quem está deletando é o <code>added_by</code> ou o <code>owner</code> da lista. Retorne status 204 sem body.</div>
+          <div class="task-tags"><span class="tag">rest</span><span class="tag">items</span></div>
+        </div>
+        <div class="task-num">#26</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Implementar rota GET /api/lists/:listId/suggestions</div>
+          <div class="task-desc">Consulta a tabela <code>item_history</code> ordenando por <code>times_added DESC</code> com limite de 10 resultados. Exclui itens que já estão na lista atual e não foram desmarcados.</div>
+          <div class="task-tags"><span class="tag">rest</span><span class="tag">sugestões</span></div>
+        </div>
+        <div class="task-num">#27</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Testar todos os endpoints com Insomnia ou Postman</div>
+          <div class="task-desc">Crie uma collection no Insomnia/Postman com todos os endpoints. Teste o fluxo completo: criar usuário → criar lista → entrar na lista com outro usuário → adicionar itens → marcar itens.</div>
+          <div class="task-tags"><span class="tag">teste</span><span class="tag">validação</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Testar fluxo de criação de usuário e lista</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Testar join com share_code</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Testar CRUD de itens</div>
+          </div>
+        </div>
+        <div class="task-num">#28</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="phase-connector"><div class="connector-line"></div></div>
+
+  <!-- ═══════════════════════════════ -->
+  <!-- FASE 4 — FLUTTER                -->
+  <!-- ═══════════════════════════════ -->
+  <div class="phase" id="phase-4">
+    <div class="phase-header" onclick="togglePhase('phase-4')">
+      <div class="phase-number" style="background:var(--phase4)">4</div>
+      <div class="phase-title-wrap">
+        <div class="phase-title">App Flutter — Telas & Estado</div>
+        <div class="phase-meta">
+          <span class="phase-time">⏱ ~8h</span>
+          <span class="phase-count" style="background:rgba(122,45,140,0.1);color:var(--phase4)" id="count-phase-4">— tarefas</span>
+        </div>
+      </div>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="tasks">
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Adicionar dependências ao pubspec.yaml do app</div>
+          <div class="task-desc">Adicione: <code>riverpod</code> (gerenciamento de estado), <code>dio</code> (HTTP), <code>web_socket_channel</code> (WebSocket), <code>drift</code> (cache offline), <code>shared_preferences</code> (salvar user_id local), <code>go_router</code> (navegação).</div>
+          <div class="task-tags"><span class="tag">flutter</span><span class="tag">dependências</span></div>
+        </div>
+        <div class="task-num">#29</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar camada de models (copiar do backend)</div>
+          <div class="task-desc">Crie <code>lib/models/</code> com os arquivos <code>user.dart</code>, <code>shopping_list.dart</code>, <code>shopping_item.dart</code> e <code>category.dart</code> com os métodos <code>fromJson</code>, <code>toJson</code> e <code>copyWith</code> já modelados.</div>
+          <div class="task-tags"><span class="tag">models</span></div>
+        </div>
+        <div class="task-num">#30</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar ApiClient com Dio</div>
+          <div class="task-desc">Crie <code>lib/services/api_client.dart</code> que instancia o Dio com a <code>baseUrl</code> do backend. Adicione um interceptor para logar erros e outro para injetar o <code>user_id</code> salvo localmente como header <code>X-User-Id</code>.</div>
+          <div class="task-tags"><span class="tag">http</span><span class="tag">dio</span></div>
+        </div>
+        <div class="task-num">#31</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar tela de onboarding (nome + emoji)</div>
+          <div class="task-desc">Primeira tela que aparece se não há <code>user_id</code> salvo. Usuário digita o nome, escolhe um emoji avatar, e ao confirmar, chama <code>POST /api/users</code>. Salva o <code>user_id</code> retornado no <code>SharedPreferences</code>.</div>
+          <div class="task-tags"><span class="tag">ui</span><span class="tag">onboarding</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Criar campo de nome</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Criar seletor de emoji</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Chamar API e salvar user_id localmente</div>
+          </div>
+        </div>
+        <div class="task-num">#32</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar tela Home — criar ou entrar em lista</div>
+          <div class="task-desc">Tela principal com duas opções: "Criar nova lista" (abre modal para nomear) e "Entrar em lista" (campo para digitar o share_code de 6 dígitos). Liste as listas que o usuário já participa.</div>
+          <div class="task-tags"><span class="tag">ui</span><span class="tag">home</span></div>
+        </div>
+        <div class="task-num">#33</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar tela da Lista de Compras</div>
+          <div class="task-desc">Tela principal do app. Mostra os itens agrupados por categoria, com checkbox para marcar cada um. Barra superior com nome da lista, share_code (botão de copiar) e avatars dos membros online.</div>
+          <div class="task-tags"><span class="tag">ui</span><span class="tag">lista</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Listar itens agrupados por categoria</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Checkbox com animação de check</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Mostrar quem marcou cada item</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Botão de copiar share_code</div>
+          </div>
+        </div>
+        <div class="task-num">#34</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar bottom sheet de adicionar item</div>
+          <div class="task-desc">Sheet que abre ao clicar em "+". Campos: nome do item, quantidade, unidade (kg/L/un/etc), categoria (chips selecionáveis) e nota opcional. Mostra sugestões de itens frequentes acima do teclado.</div>
+          <div class="task-tags"><span class="tag">ui</span><span class="tag">items</span></div>
+        </div>
+        <div class="task-num">#35</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Configurar Riverpod — providers e estado global</div>
+          <div class="task-desc">Crie providers para: <code>currentUserProvider</code> (usuário logado), <code>listProvider(listId)</code> (estado da lista em tempo real), <code>apiClientProvider</code>. Use <code>AsyncNotifierProvider</code> para dados assíncronos.</div>
+          <div class="task-tags"><span class="tag">riverpod</span><span class="tag">estado</span></div>
+        </div>
+        <div class="task-num">#36</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Configurar go_router — rotas do app</div>
+          <div class="task-desc">Defina as rotas: <code>/</code> (home), <code>/onboarding</code>, <code>/list/:id</code>. Implemente o redirecionamento automático: se não houver <code>user_id</code> salvo, redirecione para <code>/onboarding</code>.</div>
+          <div class="task-tags"><span class="tag">navegação</span><span class="tag">go_router</span></div>
+        </div>
+        <div class="task-num">#37</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="phase-connector"><div class="connector-line"></div></div>
+
+  <!-- ═══════════════════════════════ -->
+  <!-- FASE 5 — WEBSOCKET              -->
+  <!-- ═══════════════════════════════ -->
+  <div class="phase" id="phase-5">
+    <div class="phase-header" onclick="togglePhase('phase-5')">
+      <div class="phase-number" style="background:var(--phase5)">5</div>
+      <div class="phase-title-wrap">
+        <div class="phase-title">WebSocket — Tempo Real</div>
+        <div class="phase-meta">
+          <span class="phase-time">⏱ ~5h</span>
+          <span class="phase-count" style="background:rgba(138,90,0,0.1);color:var(--phase5)" id="count-phase-5">— tarefas</span>
+        </div>
+      </div>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="tasks">
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar rota WebSocket no Dart Frog</div>
+          <div class="task-desc">Crie <code>routes/ws/lists/[listId].dart</code> usando o handler <code>webSocketHandler()</code> do Dart Frog. Ao conectar, valide que o <code>user_id</code> passado como query param é membro da lista.</div>
+          <div class="task-tags"><span class="tag">websocket</span><span class="tag">dart frog</span></div>
+        </div>
+        <div class="task-num">#38</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Implementar gerenciador de conexões (Connection Manager)</div>
+          <div class="task-desc">Crie <code>services/connection_manager.dart</code> como singleton que mantém um <code>Map&lt;String, Set&lt;WebSocketChannel&gt;&gt;</code> mapeando <code>listId</code> para os clientes conectados. Implemente os métodos <code>subscribe</code>, <code>unsubscribe</code> e <code>broadcast</code>.</div>
+          <div class="task-tags"><span class="tag">websocket</span><span class="tag">backend</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Criar mapa de conexões por lista</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Implementar método <code>broadcast(listId, event)</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Limpar conexões ao desconectar</div>
+          </div>
+        </div>
+        <div class="task-num">#39</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Implementar eventos de broadcast nos endpoints REST</div>
+          <div class="task-desc">Após cada operação de escrita bem-sucedida na API REST, chame o <code>ConnectionManager.broadcast()</code>. Implemente para: item adicionado, item marcado/desmarcado, item deletado e membro entrou na lista.</div>
+          <div class="task-tags"><span class="tag">websocket</span><span class="tag">eventos</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Broadcast em <code>POST /items</code> → evento <code>item.added</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Broadcast em <code>PATCH /items/check</code> → evento <code>item.checked</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Broadcast em <code>DELETE /items</code> → evento <code>item.deleted</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Broadcast em <code>POST /lists/join</code> → evento <code>member.joined</code></div>
+          </div>
+        </div>
+        <div class="task-num">#40</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Criar WebSocketService no Flutter</div>
+          <div class="task-desc">Crie <code>lib/services/websocket_service.dart</code> que gerencia a conexão com o backend. Implemente reconexão automática com backoff exponencial (tente em 1s, 2s, 4s, 8s...) para quando a conexão cair.</div>
+          <div class="task-tags"><span class="tag">flutter</span><span class="tag">websocket</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Conectar ao WS ao abrir a lista</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Desconectar ao sair da tela</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Implementar reconexão automática</div>
+          </div>
+        </div>
+        <div class="task-num">#41</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Conectar eventos WS ao estado do Riverpod</div>
+          <div class="task-desc">No <code>listProvider</code>, ouça o stream do <code>WebSocketService</code>. Para cada evento recebido, atualize o estado local: adicione/remova/atualize itens na lista sem precisar refazer a requisição HTTP inteira.</div>
+          <div class="task-tags"><span class="tag">riverpod</span><span class="tag">websocket</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Handler para evento <code>item.added</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Handler para evento <code>item.checked</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Handler para evento <code>item.deleted</code></div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Handler para evento <code>member.joined</code></div>
+          </div>
+        </div>
+        <div class="task-num">#42</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Testar sincronização em tempo real com dois dispositivos</div>
+          <div class="task-desc">Abra o app em dois emuladores (ou emulador + dispositivo físico) com a mesma lista. Teste: adicionar item no dispositivo A e ver aparecer no B, marcar item no B e ver riscado no A. Valide latência e consistência.</div>
+          <div class="task-tags"><span class="tag">teste</span><span class="tag">validação</span></div>
+        </div>
+        <div class="task-num">#43</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="phase-connector"><div class="connector-line"></div></div>
+
+  <!-- ═══════════════════════════════ -->
+  <!-- FASE 6 — FINALIZAÇÃO            -->
+  <!-- ═══════════════════════════════ -->
+  <div class="phase" id="phase-6">
+    <div class="phase-header" onclick="togglePhase('phase-6')">
+      <div class="phase-number" style="background:var(--phase6)">6</div>
+      <div class="phase-title-wrap">
+        <div class="phase-title">Polimento & Deploy</div>
+        <div class="phase-meta">
+          <span class="phase-time">⏱ ~4h</span>
+          <span class="phase-count" style="background:rgba(45,107,107,0.1);color:var(--phase6)" id="count-phase-6">— tarefas</span>
+        </div>
+      </div>
+      <span class="phase-toggle">▾</span>
+    </div>
+    <div class="tasks">
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Implementar modo offline no Flutter com Drift</div>
+          <div class="task-desc">Configure um banco Drift local no app. Ao carregar a lista, salve os dados localmente. Se não houver conexão, mostre os dados cacheados com um banner "Sem conexão". Sincronize ao reconectar.</div>
+          <div class="task-tags"><span class="tag">offline</span><span class="tag">drift</span></div>
+        </div>
+        <div class="task-num">#44</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Tratamento global de erros na API</div>
+          <div class="task-desc">Crie um middleware de error handling no Dart Frog que captura exceções não tratadas e retorna JSON padronizado: <code>{"error": "mensagem", "code": "ERROR_CODE"}</code>. Trate especialmente erros de validação (400) e not found (404).</div>
+          <div class="task-tags"><span class="tag">error handling</span><span class="tag">api</span></div>
+        </div>
+        <div class="task-num">#45</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Dockerizar o backend para deploy</div>
+          <div class="task-desc">Crie um <code>Dockerfile</code> multi-stage para o backend: stage de build compilando o Dart para executável nativo, e stage final com imagem mínima. Atualize o <code>docker-compose.yml</code> para incluir o serviço do backend junto com o PostgreSQL.</div>
+          <div class="task-tags"><span class="tag">docker</span><span class="tag">deploy</span></div>
+          <div class="subtasks">
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Criar <code>Dockerfile</code> multi-stage</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Adicionar serviço <code>backend</code> ao docker-compose</div>
+            <div class="subtask" onclick="toggleSubtask(this,event)"><div class="sub-check">✓</div>Testar <code>docker compose up</code> completo</div>
+          </div>
+        </div>
+        <div class="task-num">#46</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Deploy do backend em VPS (Railway ou Fly.io)</div>
+          <div class="task-desc">Faça deploy do container no Railway ou Fly.io (ambos têm plano gratuito). Configure as variáveis de ambiente no painel. Atualize a <code>baseUrl</code> do Dio no app Flutter para apontar para o servidor em produção.</div>
+          <div class="task-tags"><span class="tag">deploy</span><span class="tag">produção</span></div>
+        </div>
+        <div class="task-num">#47</div>
+      </div>
+
+      <div class="task" onclick="toggleTask(this)">
+        <div class="task-check"><span class="task-check-icon">✓</span></div>
+        <div class="task-body">
+          <div class="task-title">Build do app Flutter para Android (.apk)</div>
+          <div class="task-desc">Configure o <code>android/app/build.gradle</code> com o applicationId correto. Rode <code>flutter build apk --release</code>. Instale o APK em um dispositivo Android real para teste final.</div>
+          <div class="task-tags"><span class="tag">flutter</span><span class="tag">android</span></div>
+        </div>
+        <div class="task-num">#48</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+  <div class="stat">
+    <span class="stat-val" id="bar-done">0</span>
+    <span class="stat-label">feitas</span>
+  </div>
+  <div class="stat">
+    <span class="stat-val" id="bar-remaining">0</span>
+    <span class="stat-label">restantes</span>
+  </div>
+  <div class="stat" id="bar-phase-stat">
+    <span class="stat-val" id="bar-phase">—</span>
+    <span class="stat-label">fase atual</span>
+  </div>
+  <div class="stat" style="margin-left:auto">
+    <span class="stat-val" id="bar-pct" style="color:#00e5a0">0%</span>
+    <span class="stat-label">completo</span>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">↺ RESET</button>
+</div>
+
+<script>
+  const STORAGE_KEY = 'shopshare_tasks_v1';
+
+  function saveState() {
+    const done = [];
+    document.querySelectorAll('.task.done').forEach((t, i) => {
+      done.push(t.dataset.taskId);
+    });
+    const subDone = [];
+    document.querySelectorAll('.subtask.done').forEach(s => {
+      subDone.push(s.dataset.subId);
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ done, subDone }));
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : { done: [], subDone: [] };
+    } catch { return { done: [], subDone: [] }; }
+  }
+
+  // Assign IDs
+  let taskIdx = 0;
+  document.querySelectorAll('.task').forEach(t => {
+    t.dataset.taskId = 'task-' + taskIdx++;
+  });
+  let subIdx = 0;
+  document.querySelectorAll('.subtask').forEach(s => {
+    s.dataset.subId = 'sub-' + subIdx++;
+  });
+
+  function updateCounters() {
+    const total = document.querySelectorAll('.task').length;
+    const done = document.querySelectorAll('.task.done').length;
+    const pct = total ? Math.round(done / total * 100) : 0;
+
+    document.getElementById('done-count').textContent = done;
+    document.getElementById('total-count').textContent = total;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('bar-done').textContent = done;
+    document.getElementById('bar-remaining').textContent = total - done;
+    document.getElementById('bar-pct').textContent = pct + '%';
+
+    // Phase counts
+    for (let i = 1; i <= 6; i++) {
+      const phase = document.getElementById('phase-' + i);
+      const tasks = phase.querySelectorAll('.task');
+      const doneTasks = phase.querySelectorAll('.task.done');
+      const el = document.getElementById('count-phase-' + i);
+      el.textContent = doneTasks.length + '/' + tasks.length + ' feitas';
+    }
+
+    // Current phase
+    let currentPhase = '—';
+    for (let i = 1; i <= 6; i++) {
+      const phase = document.getElementById('phase-' + i);
+      const tasks = phase.querySelectorAll('.task');
+      const doneTasks = phase.querySelectorAll('.task.done');
+      if (doneTasks.length < tasks.length) {
+        currentPhase = i;
+        break;
+      }
+    }
+    document.getElementById('bar-phase').textContent = currentPhase === '—' ? '✓' : currentPhase;
+  }
+
+  function toggleTask(el) {
+    if (event.target.closest('.subtask')) return;
+    el.classList.toggle('done');
+    updateCounters();
+    saveState();
+  }
+
+  function toggleSubtask(el, e) {
+    e.stopPropagation();
+    el.classList.toggle('done');
+    el.querySelector('.sub-check').textContent = el.classList.contains('done') ? '✓' : '';
+    saveState();
+  }
+
+  function togglePhase(id) {
+    document.getElementById(id).classList.toggle('collapsed');
+  }
+
+  function resetAll() {
+    if (!confirm('Resetar todo o progresso?')) return;
+    document.querySelectorAll('.task.done').forEach(t => t.classList.remove('done'));
+    document.querySelectorAll('.subtask.done').forEach(s => {
+      s.classList.remove('done');
+      s.querySelector('.sub-check').textContent = '✓';
+    });
+    localStorage.removeItem(STORAGE_KEY);
+    updateCounters();
+  }
+
+  // Load saved state
+  const state = loadState();
+  state.done.forEach(id => {
+    const el = document.querySelector(`[data-task-id="${id}"]`);
+    if (el) el.classList.add('done');
+  });
+  state.subDone.forEach(id => {
+    const el = document.querySelector(`[data-sub-id="${id}"]`);
+    if (el) {
+      el.classList.add('done');
+    }
+  });
+
+  updateCounters();
+</script>
+</body>
+</html>
