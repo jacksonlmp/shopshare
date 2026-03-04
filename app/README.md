@@ -50,8 +50,18 @@ cd app
 # Install dependencies
 flutter pub get
 
-# Run on emulator or connected device
-flutter run
+# Run on Linux desktop (WSL2 — displays via WSLg)
+flutter run -d linux
 ```
+
+> **WSL2 note:** `flutter devices` only detects the Linux desktop target in WSL2.
+> The app window is rendered via WSLg and appears on your Windows display.
+>
+> To run on an Android emulator, start an AVD from Android Studio on Windows first,
+> then expose the ADB bridge to WSL:
+> ```bash
+> export ADB_SERVER_SOCKET=tcp:localhost:5037
+> flutter run -d <device-id>
+> ```
 
 Make sure the backend is running at `http://localhost:8080` before starting the app.
