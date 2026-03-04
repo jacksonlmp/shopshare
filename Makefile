@@ -52,12 +52,11 @@ app:
 dev: db
 	@echo "→ Starting backend in background (logs: backend.log)..."
 	@export PATH="$$PATH:$$HOME/.pub-cache/bin"; \
-	cd backend && dart_frog dev > ../backend.log 2>&1 & \
+	cd "$(CURDIR)/backend" && dart_frog dev > "$(CURDIR)/backend.log" 2>&1 & \
 	echo "→ Waiting for backend on port 8080..."; \
 	until curl -sf http://localhost:8080 > /dev/null 2>&1; do sleep 1; done; \
 	echo "✓ Backend is up. Starting Flutter app..."; \
-	cd ../app && flutter run -d linux
-	@echo "Tip: tail -f backend.log to watch backend logs."
+	cd "$(CURDIR)/app" && flutter run -d linux
 
 # ── Setup ────────────────────────────────────────────────────────────────────
 
