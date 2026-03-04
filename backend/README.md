@@ -1,6 +1,10 @@
 # ShopShare — Backend
 
-Backend project for ShopShare, built with **Dart Frog**.
+[![Powered by Dart Frog](https://img.shields.io/endpoint?url=https://tinyurl.com/dartfrog-badge)](https://dart-frog.dev)
+[![style: dart frog lint][dart_frog_lint_badge]][dart_frog_lint_link]
+[![License: MIT][license_badge]][license_link]
+
+Backend for [ShopShare](../README.md) — a real-time shared shopping list app. Built with **Dart Frog**.
 
 ## Stack
 
@@ -57,3 +61,8 @@ Create a `.env` file inside `backend/` based on `.env.example` at the repo root:
 DATABASE_URL=postgresql://shopuser:shoppassword@localhost:5432/shopshare
 PORT=8080
 ```
+
+[dart_frog_lint_badge]: https://img.shields.io/badge/style-dart_frog_lint-1DF9D2.svg
+[dart_frog_lint_link]: https://pub.dev/packages/dart_frog_lint
+[license_badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[license_link]: https://opensource.org/licenses/MIT
