@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:backend/database/tables/categories.dart';
+import 'package:backend/database/tables/list_members.dart';
+import 'package:backend/database/tables/lists.dart';
 import 'package:backend/database/tables/users.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_postgres/drift_postgres.dart';
@@ -14,7 +16,7 @@ part 'app_database.g.dart';
 /// ```dart
 /// final db = AppDatabase.instance;
 /// ```
-@DriftDatabase(tables: [Users, Categories])
+@DriftDatabase(tables: [Users, Lists, ListMembers, Categories])
 class AppDatabase extends _$AppDatabase {
   /// Creates or returns the singleton instance of [AppDatabase].
   factory AppDatabase() {
@@ -27,12 +29,19 @@ class AppDatabase extends _$AppDatabase {
   static AppDatabase? _instance;
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async {
           await m.createAll();
+        },
+        onUpgrade: (m, from, to) async {
+          // v1 → v2: added lists and list_members tables
+          if (from < 2) {
+            await m.createTable(lists);
+            await m.createTable(listMembers);
+          }
         },
       );
 }
