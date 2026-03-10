@@ -5,9 +5,7 @@ import 'package:dart_frog/dart_frog.dart';
 
 Handler middleware(Handler handler) {
   final db = AppDatabase();
-  return handler
-      .use(provider<AppDatabase>((_) => db))
-      .use(_cors);
+  return handler.use(provider<AppDatabase>((_) => db)).use(_cors);
 }
 
 /// Adds CORS headers to every response and short-circuits OPTIONS preflight

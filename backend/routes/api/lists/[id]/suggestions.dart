@@ -24,11 +24,13 @@ Future<Response> _handleGet(RequestContext context, String listId) async {
   final suggestions = await db.itemsDao.getSuggestions(listId);
 
   return Response.json(
-    body: suggestions.map((h) => {
-      'item_name': h.itemName,
-      'times_added': h.timesAdded,
-      'category_id': h.categoryId,
-      'last_used_at': h.lastUsedAt.toIso8601String(),
-    }).toList(),
+    body: suggestions
+        .map((h) => {
+              'item_name': h.itemName,
+              'times_added': h.timesAdded,
+              'category_id': h.categoryId,
+              'last_used_at': h.lastUsedAt.toIso8601String(),
+            })
+        .toList(),
   );
 }

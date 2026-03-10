@@ -23,12 +23,15 @@ Future<Response> _handlePost(RequestContext context, String listId) async {
   }
 
   final addedBy = body['added_by'] as String?;
-  final name    = body['name'] as String?;
+  final name = body['name'] as String?;
 
   if (addedBy == null || addedBy.trim().isEmpty) {
     return Response.json(
       statusCode: HttpStatus.badRequest,
-      body: {'error': 'Field added_by is required.', 'code': 'MISSING_ADDED_BY'},
+      body: {
+        'error': 'Field added_by is required.',
+        'code': 'MISSING_ADDED_BY'
+      },
     );
   }
 
@@ -39,9 +42,9 @@ Future<Response> _handlePost(RequestContext context, String listId) async {
     );
   }
 
-  final quantity   = (body['quantity'] as num?)?.toDouble() ?? 1.0;
-  final unit       = body['unit'] as String?;
-  final note       = body['note'] as String?;
+  final quantity = (body['quantity'] as num?)?.toDouble() ?? 1.0;
+  final unit = body['unit'] as String?;
+  final note = body['note'] as String?;
   final categoryId = body['category_id'] as int?;
 
   if (quantity <= 0) {

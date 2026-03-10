@@ -20,11 +20,12 @@ class ItemsDao extends DatabaseAccessor<AppDatabase> with _$ItemsDaoMixin {
   ItemsDao(super.db);
 
   Future<List<ItemWithDetails>> getItemsWithDetails(String listId) {
-    final query = (select(items)..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
-        .join([
+    final query =
+        (select(items)..orderBy([(t) => OrderingTerm.asc(t.sortOrder)])).join([
       innerJoin(users, users.id.equalsExp(items.addedBy)),
       leftOuterJoin(categories, categories.id.equalsExp(items.categoryId)),
-    ])..where(items.listId.equals(listId));
+    ])
+          ..where(items.listId.equals(listId));
 
     return query
         .map(

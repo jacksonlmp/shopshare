@@ -32,8 +32,8 @@ Future<Response> _handlePatch(RequestContext context, String id) async {
     );
   }
 
-  final newName       = body['name'] as String?;
-  final isArchived    = body['is_archived'] as bool?;
+  final newName = body['name'] as String?;
+  final isArchived = body['is_archived'] as bool?;
 
   if (newName == null && isArchived == null) {
     return Response.json(
@@ -65,7 +65,10 @@ Future<Response> _handlePatch(RequestContext context, String id) async {
   if (list.ownerId != userId) {
     return Response.json(
       statusCode: HttpStatus.forbidden,
-      body: {'error': 'Only the owner can modify this list.', 'code': 'NOT_OWNER'},
+      body: {
+        'error': 'Only the owner can modify this list.',
+        'code': 'NOT_OWNER'
+      },
     );
   }
 

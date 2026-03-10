@@ -28,7 +28,10 @@ Future<Response> _handlePost(RequestContext context) async {
   if (shareCode == null || shareCode.trim().isEmpty) {
     return Response.json(
       statusCode: HttpStatus.badRequest,
-      body: {'error': 'Field share_code is required.', 'code': 'MISSING_SHARE_CODE'},
+      body: {
+        'error': 'Field share_code is required.',
+        'code': 'MISSING_SHARE_CODE'
+      },
     );
   }
 
@@ -41,7 +44,8 @@ Future<Response> _handlePost(RequestContext context) async {
 
   final db = context.read<AppDatabase>();
 
-  final list = await db.listsDao.findByShareCode(shareCode.trim().toUpperCase());
+  final list =
+      await db.listsDao.findByShareCode(shareCode.trim().toUpperCase());
   if (list == null) {
     return Response.json(
       statusCode: HttpStatus.notFound,
@@ -56,7 +60,10 @@ Future<Response> _handlePost(RequestContext context) async {
   if (alreadyMember) {
     return Response.json(
       statusCode: HttpStatus.conflict,
-      body: {'error': 'User is already a member of this list.', 'code': 'ALREADY_MEMBER'},
+      body: {
+        'error': 'User is already a member of this list.',
+        'code': 'ALREADY_MEMBER'
+      },
     );
   }
 

@@ -107,5 +107,6 @@ Future<String> _generateUniqueShareCode(AppDatabase db) async {
     final existing = await db.listsDao.findByShareCode(code);
     if (existing == null) return code;
   }
-  throw StateError('Could not generate unique share_code after $_maxAttempts attempts.');
+  throw StateError(
+      'Could not generate unique share_code after $_maxAttempts attempts.');
 }

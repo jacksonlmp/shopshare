@@ -100,7 +100,8 @@ class ListsDao extends DatabaseAccessor<AppDatabase> with _$ListsDaoMixin {
   Future<List<MemberWithUser>> getMembersWithUsers(String listId) {
     final query = select(listMembers).join([
       innerJoin(users, users.id.equalsExp(listMembers.userId)),
-    ])..where(listMembers.listId.equals(listId));
+    ])
+      ..where(listMembers.listId.equals(listId));
 
     return query
         .map(
