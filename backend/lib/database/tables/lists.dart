@@ -22,16 +22,16 @@ class Lists extends Table {
   TextColumn get ownerId => text().references(Users, #id)();
 
   /// When true, the list is hidden from the active lists view.
-  BoolColumn get isArchived => boolean().withDefault(const Constant(false))();
+  BoolColumn get isArchived => boolean()
+      .withDefault(const CustomExpression('FALSE'))
+      .customConstraint('NOT NULL DEFAULT FALSE')();
 
   /// Timestamp of creation (UTC).
-  DateTimeColumn get createdAt =>
-      dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get createdAt => dateTime()();
 
   /// Timestamp of the last modification (UTC).
   /// Must be updated manually on every write operation.
-  DateTimeColumn get updatedAt =>
-      dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime()();
 
   @override
   Set<Column> get primaryKey => {id};

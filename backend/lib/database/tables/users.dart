@@ -21,8 +21,7 @@ class Users extends Table {
   TextColumn get deviceToken => text().nullable()();
 
   /// Timestamp of when the user was created (UTC).
-  DateTimeColumn get createdAt =>
-      dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get createdAt => dateTime()();
 
   @override
   Set<Column> get primaryKey => {id};
