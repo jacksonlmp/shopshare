@@ -30,8 +30,7 @@ class ListMembers extends Table {
   TextColumn get role => textEnum<ListMemberRole>()();
 
   /// Timestamp of when the user joined or was set as owner (UTC).
-  DateTimeColumn get joinedAt =>
-      dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get joinedAt => dateTime()();
 
   /// Composite primary key — a user can only appear once per list.
   @override
