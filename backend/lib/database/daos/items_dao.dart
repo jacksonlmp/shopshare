@@ -1,14 +1,41 @@
 import 'package:drift/drift.dart';
 
 import '../app_database.dart';
+import '../tables/categories.dart';
 import '../tables/item_history.dart';
 import '../tables/items.dart';
+import '../tables/users.dart';
 
 part 'items_dao.g.dart';
 
-@DriftAccessor(tables: [Items, ItemHistory])
+/// Holds an [Item] row joined with its [addedByUser] and optional [category].
+typedef ItemWithDetails = ({
+  Item item,
+  User addedByUser,
+  Category? category,
+});
+
+@DriftAccessor(tables: [Items, ItemHistory, Users, Categories])
 class ItemsDao extends DatabaseAccessor<AppDatabase> with _$ItemsDaoMixin {
   ItemsDao(super.db);
+
+  Future<List<ItemWithDetails>> getItemsWithDetails(String listId) {
+    final query = (select(items)..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
+        .join([
+      innerJoin(users, users.id.equalsExp(items.addedBy)),
+      leftOuterJoin(categories, categories.id.equalsExp(items.categoryId)),
+    ])..where(items.listId.equals(listId));
+
+    return query
+        .map(
+          (row) => (
+            item: row.readTable(items),
+            addedByUser: row.readTable(users),
+            category: row.readTableOrNull(categories),
+          ),
+        )
+        .get();
+  }
 
   Future<Item?> findById(String id) =>
       (select(items)..where((t) => t.id.equals(id))).getSingleOrNull();
@@ -98,12 +125,27 @@ class ItemsDao extends DatabaseAccessor<AppDatabase> with _$ItemsDaoMixin {
   Future<int> deleteItem(String id) =>
       (delete(items)..where((t) => t.id.equals(id))).go();
 
-  /// Returns suggestions ordered by frequency descending.
-  Future<List<ItemHistoryEntry>> getSuggestions(String listId,
-          {int limit = 10}) =>
-      (select(itemHistory)
-            ..where((t) => t.listId.equals(listId))
-            ..orderBy([(t) => OrderingTerm.desc(t.timesAdded)])
-            ..limit(limit))
-          .get();
+  /// Returns suggestions ordered by frequency descending, excluding items that
+  /// are currently active (present in the list and not yet checked off).
+  Future<List<ItemHistoryEntry>> getSuggestions(
+    String listId, {
+    int limit = 10,
+  }) async {
+    // Collect names of unchecked items currently in the list.
+    final activeItems = await (select(items)
+          ..where((t) => t.listId.equals(listId) & t.isChecked.equals(false)))
+        .get();
+    final activeNames = activeItems.map((i) => i.name).toSet();
+
+    final rows = await (select(itemHistory)
+          ..where((t) => t.listId.equals(listId))
+          ..orderBy([(t) => OrderingTerm.desc(t.timesAdded)])
+          ..limit(limit + activeNames.length))
+        .get();
+
+    return rows
+        .where((h) => !activeNames.contains(h.itemName))
+        .take(limit)
+        .toList();
+  }
 }

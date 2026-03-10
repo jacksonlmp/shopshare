@@ -3,10 +3,14 @@ import 'package:drift/drift.dart';
 import '../app_database.dart';
 import '../tables/list_members.dart';
 import '../tables/lists.dart';
+import '../tables/users.dart';
 
 part 'lists_dao.g.dart';
 
-@DriftAccessor(tables: [Lists, ListMembers])
+/// Holds a [ListMember] row joined with its corresponding [User].
+typedef MemberWithUser = ({ListMember member, User user});
+
+@DriftAccessor(tables: [Lists, ListMembers, Users])
 class ListsDao extends DatabaseAccessor<AppDatabase> with _$ListsDaoMixin {
   ListsDao(super.db);
 
@@ -91,6 +95,21 @@ class ListsDao extends DatabaseAccessor<AppDatabase> with _$ListsDaoMixin {
           ))
         .getSingleOrNull();
     return row != null;
+  }
+
+  Future<List<MemberWithUser>> getMembersWithUsers(String listId) {
+    final query = select(listMembers).join([
+      innerJoin(users, users.id.equalsExp(listMembers.userId)),
+    ])..where(listMembers.listId.equals(listId));
+
+    return query
+        .map(
+          (row) => (
+            member: row.readTable(listMembers),
+            user: row.readTable(users),
+          ),
+        )
+        .get();
   }
 
   Future<List<ListMember>> getMembersByList(String listId) =>
