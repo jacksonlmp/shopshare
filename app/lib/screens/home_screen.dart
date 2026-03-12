@@ -53,10 +53,8 @@ class HomeScreen extends ConsumerWidget {
                   onRetry: () => ref.read(listsProvider.notifier).refresh(),
                 ),
                 data: (lists) {
-                  final active =
-                      lists.where((l) => !l.isArchived).toList();
-                  final archived =
-                      lists.where((l) => l.isArchived).toList();
+                  final active = lists.where((l) => !l.isArchived).toList();
+                  final archived = lists.where((l) => l.isArchived).toList();
 
                   if (active.isEmpty && archived.isEmpty) {
                     return _EmptyState(
@@ -64,10 +62,7 @@ class HomeScreen extends ConsumerWidget {
                     );
                   }
 
-                  return _ListsView(
-                    active: active,
-                    archived: archived,
-                  );
+                  return _ListsView(active: active, archived: archived);
                 },
               ),
             ),
@@ -121,8 +116,8 @@ class HomeScreen extends ConsumerWidget {
             final msg = statusCode == 404
                 ? 'Lista não encontrada. Verifique o código.'
                 : statusCode == 409
-                    ? 'Você já é membro desta lista.'
-                    : 'Não foi possível entrar na lista.';
+                ? 'Você já é membro desta lista.'
+                : 'Não foi possível entrar na lista.';
             if (context.mounted) _showSnack(context, msg);
           }
         },
@@ -397,9 +392,7 @@ class _ListCard extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        total == 0
-                            ? 'Vazia'
-                            : '$checked/$total completo',
+                        total == 0 ? 'Vazia' : '$checked/$total completo',
                         style: TextStyle(
                           color: total > 0 && checked == total
                               ? _kPurple
@@ -417,8 +410,7 @@ class _ListCard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: progress,
                       backgroundColor: _kPurpleDim.withAlpha(80),
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(_kPurple),
+                      valueColor: const AlwaysStoppedAnimation<Color>(_kPurple),
                       minHeight: 4,
                     ),
                   ),
@@ -465,10 +457,7 @@ class _MemberAvatars extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             '+$overflow',
-            style: const TextStyle(
-              color: _kTextSecondary,
-              fontSize: 12,
-            ),
+            style: const TextStyle(color: _kTextSecondary, fontSize: 12),
           ),
         ],
       ],
@@ -534,10 +523,7 @@ class _ArchivedToggle extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               'Listas Arquivadas ($count)',
-              style: const TextStyle(
-                color: _kTextSecondary,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: _kTextSecondary, fontSize: 14),
             ),
             const SizedBox(width: 4),
             Icon(
@@ -649,8 +635,10 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 16),
           TextButton(
             onPressed: onRetry,
-            child: const Text('Tentar novamente',
-                style: TextStyle(color: _kPurple)),
+            child: const Text(
+              'Tentar novamente',
+              style: TextStyle(color: _kPurple),
+            ),
           ),
         ],
       ),
@@ -782,10 +770,7 @@ class _CreateListSheetState extends State<_CreateListSheet> {
                   )
                 : const Text(
                     'Criar lista',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
           ),
         ],
@@ -835,8 +820,8 @@ class _JoinListSheetState extends State<_JoinListSheet> {
         _error = statusCode == 404
             ? 'Lista não encontrada.'
             : statusCode == 409
-                ? 'Você já é membro desta lista.'
-                : 'Não foi possível entrar na lista.';
+            ? 'Você já é membro desta lista.'
+            : 'Não foi possível entrar na lista.';
       });
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -956,10 +941,7 @@ class _JoinListSheetState extends State<_JoinListSheet> {
                   )
                 : const Text(
                     'Entrar na lista',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
           ),
         ],

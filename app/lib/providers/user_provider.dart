@@ -4,11 +4,7 @@ import 'package:shopshare/providers/api_client_provider.dart';
 
 /// A lightweight snapshot of the currently logged-in user, read from
 /// [LocalStorageService]. Null when the user has not completed onboarding yet.
-typedef CurrentUser = ({
-  String userId,
-  String displayName,
-  String avatarEmoji,
-});
+typedef CurrentUser = ({String userId, String displayName, String avatarEmoji});
 
 final currentUserProvider = Provider<CurrentUser?>((ref) {
   final storage = ref.watch(localStorageServiceProvider);
