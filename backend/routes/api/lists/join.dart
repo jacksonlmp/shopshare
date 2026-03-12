@@ -30,7 +30,7 @@ Future<Response> _handlePost(RequestContext context) async {
       statusCode: HttpStatus.badRequest,
       body: {
         'error': 'Field share_code is required.',
-        'code': 'MISSING_SHARE_CODE'
+        'code': 'MISSING_SHARE_CODE',
       },
     );
   }

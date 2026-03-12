@@ -1,11 +1,15 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Base URL for Android emulator (10.0.2.2 maps to host machine's localhost).
+// Resolves the API base URL at runtime:
+// - Android emulator: 10.0.2.2 maps to the host machine's localhost.
+// - All other platforms (Linux desktop, iOS simulator, etc.): use localhost.
 // Move to AppConfig with --dart-define when environment configuration is added.
-const String _kBaseUrl = 'http://10.0.2.2:8080';
+String get _kBaseUrl =>
+    Platform.isAndroid ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
 
 // SharedPreferences key — must match the value used in LocalStorageService.
 const String _kUserIdKey = 'user_id';
