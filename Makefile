@@ -1,4 +1,4 @@
-.PHONY: help db db-stop db-restart db-logs down backend app dev dev-setup
+.PHONY: help db db-stop db-restart db-logs down backend app dev dev-setup fix-linux-linker
 
 # Default target
 help:
@@ -46,6 +46,19 @@ backend:
 
 app:
 	cd app && flutter run -d linux
+
+# Only needed if Flutter was installed via snap (snap ships without lld).
+# The official tarball install does not require this.
+fix-linux-linker:
+	@mkdir -p $(HOME)/.flutter-cc
+	@printf '#!/bin/sh\nexec /snap/flutter/current/usr/bin/clang++ "$$@"\n' \
+		> $(HOME)/.flutter-cc/clang++ && chmod +x $(HOME)/.flutter-cc/clang++
+	@printf '#!/bin/sh\nexec /snap/flutter/current/usr/bin/clang "$$@"\n' \
+		> $(HOME)/.flutter-cc/clang && chmod +x $(HOME)/.flutter-cc/clang
+	@ln -sf /usr/bin/ar $(HOME)/.flutter-cc/ar
+	@ln -sf /usr/bin/ar $(HOME)/.flutter-cc/llvm-ar
+	@ln -sf /usr/bin/ld $(HOME)/.flutter-cc/ld
+	@echo "✓ Linker wrapper ready at $(HOME)/.flutter-cc — run with: PATH=$(HOME)/.flutter-cc:$$PATH make app"
 
 # ── Dev (all-in-one) ─────────────────────────────────────────────────────────
 
