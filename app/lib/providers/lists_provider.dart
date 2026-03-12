@@ -7,7 +7,8 @@ import 'package:shopshare/models/shopping_list.dart';
 import 'package:shopshare/providers/api_client_provider.dart';
 import 'package:shopshare/providers/user_provider.dart';
 
-final listsProvider = AsyncNotifierProvider<ListsNotifier, List<ShoppingList>>(
+final listsProvider =
+    AsyncNotifierProvider<ListsNotifier, List<ShoppingList>>(
   ListsNotifier.new,
 );
 
@@ -21,9 +22,8 @@ class ListsNotifier extends AsyncNotifier<List<ShoppingList>> {
 
   Future<List<ShoppingList>> _fetchLists(String userId) async {
     final api = ref.read(apiClientProvider);
-    final Response<dynamic> response = await api.dio.get(
-      '/api/users/$userId/lists',
-    );
+    final Response<dynamic> response =
+        await api.dio.get('/api/users/$userId/lists');
     final List<dynamic> data = response.data as List<dynamic>;
     return data
         .map((e) => ShoppingList.fromJson(e as Map<String, dynamic>))
@@ -77,21 +77,16 @@ class ListsNotifier extends AsyncNotifier<List<ShoppingList>> {
     // 1. Join — returns {list_id}.
     final Response<dynamic> joinResponse = await api.dio.post(
       '/api/lists/join',
-      data: {
-        'share_code': shareCode.trim().toUpperCase(),
-        'user_id': user.userId,
-      },
+      data: {'share_code': shareCode.trim().toUpperCase(), 'user_id': user.userId},
     );
     final String listId =
         (joinResponse.data as Map<String, dynamic>)['list_id'] as String;
 
     // 2. Fetch full list details.
-    final Response<dynamic> getResponse = await api.dio.get(
-      '/api/lists/$listId',
-    );
-    final ShoppingList joined = ShoppingList.fromJson(
-      getResponse.data as Map<String, dynamic>,
-    );
+    final Response<dynamic> getResponse =
+        await api.dio.get('/api/lists/$listId');
+    final ShoppingList joined =
+        ShoppingList.fromJson(getResponse.data as Map<String, dynamic>);
 
     final List<ShoppingList> current = state.asData?.value ?? [];
     if (!current.any((l) => l.id == joined.id)) {
