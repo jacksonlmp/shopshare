@@ -1,25 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:shopshare/screens/onboarding_screen.dart';
+import 'package:shopshare/providers/api_client_provider.dart';
+import 'package:shopshare/router.dart';
 import 'package:shopshare/services/local_storage_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  final LocalStorageService storage = LocalStorageService(prefs);
-  runApp(ShopShareApp(hasUser: storage.hasUser));
+  final bool hasUser = LocalStorageService(prefs).hasUser;
+  runApp(
+    ProviderScope(
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      child: ShopShareApp(initialHasUser: hasUser),
+    ),
+  );
 }
 
-class ShopShareApp extends StatelessWidget {
-  const ShopShareApp({super.key, required this.hasUser});
+class ShopShareApp extends StatefulWidget {
+  const ShopShareApp({super.key, required this.initialHasUser});
 
-  final bool hasUser;
+  final bool initialHasUser;
+
+  @override
+  State<ShopShareApp> createState() => _ShopShareAppState();
+}
+
+class _ShopShareAppState extends State<ShopShareApp> {
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _router = buildRouter(initialHasUser: widget.initialHasUser);
+  }
+
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Compras Compartilhadas',
+    return MaterialApp.router(
+      title: 'ShopShare',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -28,49 +55,7 @@ class ShopShareApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: _RootNavigator(hasUser: hasUser),
-    );
-  }
-}
-
-/// Manages the top-level screen state:
-/// - [OnboardingScreen] when no user_id is stored
-/// - Placeholder home screen after onboarding completes (to be replaced later)
-class _RootNavigator extends StatefulWidget {
-  const _RootNavigator({required this.hasUser});
-
-  final bool hasUser;
-
-  @override
-  State<_RootNavigator> createState() => _RootNavigatorState();
-}
-
-class _RootNavigatorState extends State<_RootNavigator> {
-  late bool _hasUser;
-
-  @override
-  void initState() {
-    super.initState();
-    _hasUser = widget.hasUser;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_hasUser) {
-      return OnboardingScreen(
-        onComplete: () => setState(() => _hasUser = true),
-      );
-    }
-
-    // Temporary placeholder — will be replaced with HomeScreen + go_router.
-    return const Scaffold(
-      backgroundColor: Color(0xFF1A1A2E),
-      body: Center(
-        child: Text(
-          'Bem-vindo de volta! 🎉',
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
-      ),
+      routerConfig: _router,
     );
   }
 }

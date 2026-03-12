@@ -115,4 +115,9 @@ class ListsDao extends DatabaseAccessor<AppDatabase> with _$ListsDaoMixin {
 
   Future<List<ListMember>> getMembersByList(String listId) =>
       (select(listMembers)..where((t) => t.listId.equals(listId))).get();
+
+  /// Returns all [ListMember] rows where [userId] is a member.
+  /// Used by GET /api/users/:id/lists to enumerate a user's lists.
+  Future<List<ListMember>> getMembersByUser(String userId) =>
+      (select(listMembers)..where((t) => t.userId.equals(userId))).get();
 }
