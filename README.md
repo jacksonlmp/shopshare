@@ -1,25 +1,36 @@
 # ShopShare
 
-A real-time shared shopping list app for families and groups.
+ShopShare is now maintained with the following stacks only:
+
+- Django backend in `backend/`
+- React Native (Expo + TypeScript) mobile app in `mobile/`
 
 ## Repository Structure
 
 | Folder | Description |
 |---|---|
-| [`backend/`](backend/) | Dart Frog API server + WebSocket + PostgreSQL |
-| [`app/`](app/) | Flutter mobile app (iOS & Android) |
-
-See each folder's `README.md` for setup and development instructions.
+| `backend/` | Django + DRF API backend (Docker) |
+| `mobile/` | React Native app with Expo |
 
 ## Quick Start
 
 ```bash
-# Start the database
-docker-compose up -d postgres
+# 1) Start PostgreSQL
+make up
 
-# Run the backend (from backend/)
-dart_frog dev
+# 2) Build images and run migrations
+make dev-setup
 
-# Run the app (from app/)
-flutter run
+# 3) Start mobile (backend already in Docker)
+make dev
 ```
+
+## Useful Commands
+
+- `make up` — start backend and database via Docker
+- `make migrate` — run Django migrations inside Docker
+- `make backend-logs` — tail Django container logs
+- `make mobile` — start Expo dev server
+- `make mobile-android` — run Expo on Android
+- `make mobile-ios` — run Expo on iOS
+- `make mobile-web` — run Expo on Web
