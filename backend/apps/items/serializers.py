@@ -4,8 +4,8 @@ from apps.items.models import Item
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    list_id = serializers.UUIDField(write_only=True)
-    added_by = serializers.UUIDField(write_only=True)
+    list_id = serializers.CharField(write_only=True)
+    added_by = serializers.CharField(write_only=True)
 
     class Meta:
         model = Item
