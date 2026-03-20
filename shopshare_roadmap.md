@@ -102,19 +102,19 @@ Design: https://stitch.withgoogle.com/projects/515881793632764729?pli=1
 - [x] `GET /api/lists/` — list all lists the current user belongs to
 
 ### Items
-- [ ] `POST /api/lists/{list_id}/items/` — add an item
-  - [ ] Validate that the user is a member before inserting
-  - [ ] Update or create a record in `ItemHistory` incrementing `times_added`
-- [ ] `PATCH /api/items/{id}/check/` — check or uncheck an item
-  - [ ] Set `checked_by` and `checked_at` when checking; null both when unchecking
-- [ ] `PATCH /api/items/{id}/` — edit item details (name, quantity, note)
-- [ ] `DELETE /api/items/{id}/` — delete an item (only `added_by` or list owner)
-- [ ] `GET /api/lists/{list_id}/suggestions/` — return top 10 frequent items from `ItemHistory`
+- [x] `POST /api/lists/{list_id}/items/` — add an item
+  - [x] Validate that the user is a member before inserting
+  - [x] Update or create a record in `ItemHistory` incrementing `times_added`
+- [x] `PATCH /api/items/{id}/check/` — check or uncheck an item
+  - [x] Set `checked_by` and `checked_at` when checking; null both when unchecking
+- [x] `PATCH /api/items/{id}/` — edit item details (name, quantity, note)
+- [x] `DELETE /api/items/{id}/` — delete an item (only `added_by` or list owner)
+- [x] `GET /api/lists/{list_id}/suggestions/` — return top 10 frequent items from `ItemHistory`
 
 ### Validation & permissions
-- [ ] Create a `IsMember` DRF permission class that checks `ListMember` before any write
-- [ ] Create a `IsOwner` DRF permission class for owner-only actions
-- [ ] All write endpoints must validate the `X-User-Id` header and return 403 if membership check fails
+- [x] Create a `IsMember` DRF permission class that checks `ListMember` before any write
+- [x] Create a `IsOwner` DRF permission class for owner-only actions
+- [x] All write endpoints must validate the `X-User-Id` header and return 403 if membership check fails
 
 ### Testing
 - [ ] Test the full flow in Postman/Insomnia:
