@@ -21,20 +21,13 @@ Design: https://stitch.withgoogle.com/projects/515881793632764729?pli=1
 
 > Goal: have the monorepo set up, both projects running locally, and the database reachable.
 
-- [ ] Create the GitHub repository (`shopshare`)
-- [ ] Initialize with a `README.md` and a `.gitignore` for Python and Node
-- [ ] Create the monorepo folder structure at the root:
-  - [ ] `backend/` — Django project
-  - [ ] `app/` — React Native project
-- [ ] Install Python 3.12+ and create a virtual environment inside `backend/`
-- [ ] Install Django and project dependencies via `pip`:
-  - [ ] `django`, `djangorestframework`, `channels`, `channels-redis`
-  - [ ] `psycopg2-binary`, `python-decouple`, `drf-spectacular`
-- [ ] Create the Django project inside `backend/` with `django-admin startproject core .`
-- [ ] Verify the Django server runs with `python manage.py runserver`
-- [ ] Install Node.js 20+ and initialize the React Native project inside `app/`:
-  - [ ] Run `npx @react-native-community/cli init ShopShare`
-  - [ ] Verify the app launches on an Android emulator or iOS simulator
+- [x] Create the GitHub repository (`shopshare`)
+- [x] Initialize with a `README.md` and a `.gitignore` for Python and Node
+- [x] Create the monorepo folder structure at the root:
+  - [x] `backend/` — Django project
+  - [x] `app/` — React Native project
+- [x] Install Python 3.12+ and create a virtual environment inside `backend/`
+- [x] Install Django and project dependencies via `pip`:
 - [ ] Create `docker-compose.yml` at the root with:
   - [x] `postgres:16` service with `POSTGRES_DB=shopshare`, user and password
   - [ ] `redis:7` service (required for Django Channels)
@@ -83,19 +76,19 @@ Design: https://stitch.withgoogle.com/projects/515881793632764729?pli=1
 
 ### Setup
 - [x] Install and configure `djangorestframework` in `INSTALLED_APPS`
-- [ ] Install `drf-spectacular` and configure the auto-generated docs at `/api/schema/swagger-ui/`
+- [x] Install `drf-spectacular` and configure the auto-generated docs at `/api/schema/swagger-ui/`
 - [x] Create a global `api/` URL prefix in `core/urls.py`
-- [ ] Create a custom exception handler that returns a consistent JSON error format:
+- [x] Create a custom exception handler that returns a consistent JSON error format:
   ```json
   { "error": "Description", "code": "ERROR_CODE" }
   ```
 - [x] Add CORS headers (install `django-cors-headers`) for development
 
 ### Users
-- [ ] `POST /api/users/` — create anonymous user
-  - [ ] Accepts `display_name`, `avatar_emoji`, `device_token`
-  - [ ] Returns the created user with status 201
-- [ ] `GET /api/users/me/` — fetch user by ID (passed via `X-User-Id` header)
+- [x] `POST /api/users/` — create anonymous user
+  - [x] Accepts `display_name`, `avatar_emoji`, `device_token`
+  - [x] Returns the created user with status 201
+- [x] `GET /api/users/me/` — fetch user by ID (passed via `X-User-Id` header)
 
 ### Lists
 - [ ] `POST /api/lists/` — create a new list
@@ -127,6 +120,7 @@ Design: https://stitch.withgoogle.com/projects/515881793632764729?pli=1
 - [ ] Test the full flow in Postman/Insomnia:
   - [ ] Create user → create list → join list with a second user → add items → check items
 - [ ] Confirm `ItemHistory` is updated correctly after adding items
+- [ ] Create unit tests for each endpoint that was implemented
 
 ---
 
