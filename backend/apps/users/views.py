@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from rest_framework import status
-from rest_framework.exceptions import APIException, NotFound
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.types import OpenApiTypes
@@ -9,12 +9,8 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 
 from apps.users.models import User
 from apps.users.serializers import UserSerializer
-
-
-class MissingUserIdHeader(APIException):
-    status_code = 400
-    default_detail = "Missing X-User-Id header."
-    default_code = "missing_user_id"
+from config.api_exceptions import MissingUserIdHeader
+from config.identity import get_x_user_id
 
 
 @extend_schema(
@@ -48,12 +44,7 @@ class UserCreateView(APIView):
 )
 class UserMeView(APIView):
     def get(self, request):
-        user_id = (
-            request.headers.get("X-User-Id")
-            or request.META.get("HTTP_X_USER_ID")
-            or ""
-        ).strip()
-
+        user_id = get_x_user_id(request)
         if not user_id:
             raise MissingUserIdHeader()
 

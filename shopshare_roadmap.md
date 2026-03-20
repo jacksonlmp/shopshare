@@ -91,15 +91,15 @@ Design: https://stitch.withgoogle.com/projects/515881793632764729?pli=1
 - [x] `GET /api/users/me/` — fetch user by ID (passed via `X-User-Id` header)
 
 ### Lists
-- [ ] `POST /api/lists/` — create a new list
+- [x] `POST /api/lists/` — create a new list
   - [x] Auto-generate a unique `share_code`
   - [x] Insert the creator as a `ListMember` with role `owner` in the same transaction
-- [ ] `GET /api/lists/{id}/` — fetch list details with members and items
-- [ ] `POST /api/lists/join/` — join a list via `share_code`
-  - [ ] Validate that the user is not already a member
-  - [ ] Insert with role `member`
-- [ ] `PATCH /api/lists/{id}/` — rename or archive a list (owner only)
-- [ ] `GET /api/lists/` — list all lists the current user belongs to
+- [x] `GET /api/lists/{id}/` — fetch list details with members and items
+- [x] `POST /api/lists/join/` — join a list via `share_code`
+  - [x] Validate that the user is not already a member
+  - [x] Insert with role `member`
+- [x] `PATCH /api/lists/{id}/` — rename or archive a list (owner only)
+- [x] `GET /api/lists/` — list all lists the current user belongs to
 
 ### Items
 - [ ] `POST /api/lists/{list_id}/items/` — add an item
