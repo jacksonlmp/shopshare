@@ -31,7 +31,8 @@ make backend-logs
 ## Endpoints (initial scaffold)
 
 - `GET /health/`
-- `POST /api/users`
+- `POST /api/users/` — criar usuário anônimo (`display_name`, `avatar_emoji`, `device_token` opcional)
+- `GET /api/users/me/` — usuário atual (header `X-User-Id`)
 - `POST /api/lists`
 - `POST /api/items`
 - `GET /api/schema/` — OpenAPI schema (JSON)

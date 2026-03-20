@@ -25,6 +25,6 @@ EXPO_PUBLIC_API_BASE_URL=http://localhost:8000 npm run start
 ## Current scope
 
 - Session bootstrap with local storage
-- Onboarding screen (`POST /api/users`)
+- Onboarding screen (`POST /api/users/`)
 - Home screen placeholder
 - Root navigation with authenticated vs unauthenticated split

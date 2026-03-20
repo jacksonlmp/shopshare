@@ -24,7 +24,7 @@ export function OnboardingScreen(): JSX.Element {
     }
 
     try {
-      const response = await api.post('/api/users', {
+      const response = await api.post('/api/users/', {
         display_name: trimmed,
         avatar_emoji: avatarEmoji,
       });
