@@ -34,8 +34,9 @@ make backend-logs
 - `POST /api/users`
 - `POST /api/lists`
 - `POST /api/items`
-- `GET /api/schema/`
-- `GET /api/docs/`
+- `GET /api/schema/` — OpenAPI schema (JSON)
+- `GET /api/schema/swagger-ui/` — Swagger UI (Phase 3)
+- `GET /api/docs/` — alias da Swagger UI (compatibilidade)
 
 ## Notes
 

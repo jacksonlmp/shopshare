@@ -84,12 +84,23 @@ CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "true").lower() == 
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
 }
 
+# drf-spectacular — Phase 3 (OpenAPI 3 + Swagger UI)
+# https://drf-spectacular.readthedocs.io/en/latest/settings.html
 SPECTACULAR_SETTINGS = {
     "TITLE": "ShopShare API",
-    "DESCRIPTION": "Django migration backend for ShopShare",
+    "DESCRIPTION": "Django + DRF backend for ShopShare (shared shopping lists).",
     "VERSION": "2.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SCHEMA_PATH_PREFIX": "/api",
+    "COMPONENT_SPLIT_REQUEST": True,
+    "TAGS": [
+        {"name": "users", "description": "Anonymous user profiles"},
+        {"name": "lists", "description": "Shopping lists and membership"},
+        {"name": "items", "description": "List items"},
+    ],
 }
 
 CHANNEL_LAYERS = {
