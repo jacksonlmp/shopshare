@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from django.db.models import Prefetch
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, extend_schema
 
 from apps.items.models import Item
 from apps.lists.models import ListMember, ShoppingList

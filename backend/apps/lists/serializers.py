@@ -26,7 +26,9 @@ class ShoppingListCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data: dict) -> ShoppingList:
         owner_id = self.context["owner_id"]
         with transaction.atomic():
-            shopping_list = ShoppingList.objects.create(owner_id=owner_id, **validated_data)
+            shopping_list = ShoppingList.objects.create(
+                owner_id=owner_id, **validated_data
+            )
             ListMember.objects.create(
                 list=shopping_list,
                 user_id=owner_id,

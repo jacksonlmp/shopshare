@@ -21,8 +21,12 @@ class Category(models.Model):
 
 
 class Item(models.Model):
-    id = models.CharField(primary_key=True, default=default_item_id, editable=False, max_length=36)
-    list = models.ForeignKey(ShoppingList, on_delete=models.CASCADE, related_name="items")
+    id = models.CharField(
+        primary_key=True, default=default_item_id, editable=False, max_length=36
+    )
+    list = models.ForeignKey(
+        ShoppingList, on_delete=models.CASCADE, related_name="items"
+    )
     # Existing DB schema uses `added_by` as the FK column name (not `added_by_id`).
     added_by = models.ForeignKey(
         User,
@@ -30,7 +34,9 @@ class Item(models.Model):
         related_name="added_items",
         db_column="added_by",
     )
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, null=True, blank=True
+    )
     name = models.CharField(max_length=100)
     quantity = models.FloatField(default=1.0)
     unit = models.CharField(max_length=20, null=True, blank=True)
@@ -56,9 +62,13 @@ class Item(models.Model):
 
 
 class ItemHistory(models.Model):
-    list = models.ForeignKey(ShoppingList, on_delete=models.CASCADE, related_name="item_history")
+    list = models.ForeignKey(
+        ShoppingList, on_delete=models.CASCADE, related_name="item_history"
+    )
     item_name = models.CharField(max_length=100)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, null=True, blank=True
+    )
     times_added = models.IntegerField(default=1)
     # Stored as epoch ms in the current PostgreSQL schema.
     last_used_at = models.BigIntegerField(default=now_ms)

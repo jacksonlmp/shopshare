@@ -1,4 +1,4 @@
-.PHONY: help build setup up stop restart logs ps down backend-logs db-logs migrate makemigrations shell mobile-setup mobile mobile-android mobile-ios mobile-web mobile-lint mobile-tunnel mobile-android-debug dev dev-setup
+.PHONY: help build setup up stop restart logs ps down backend-logs db-logs migrate makemigrations shell test lint format mobile-setup mobile mobile-android mobile-ios mobile-web mobile-lint mobile-tunnel mobile-android-debug dev dev-setup
 
 # Default target
 help:
@@ -18,6 +18,9 @@ help:
 	@echo "  make migrate     Run Django migrations in Docker"
 	@echo "  make makemigrations Generate Django migrations in Docker"
 	@echo "  make shell       Open Django shell in Docker"
+	@echo "  make test        Run Django API tests (Phase 3) in Docker"
+	@echo "  make lint        Run flake8, black --check, isort --check on backend (Docker)"
+	@echo "  make format      Apply black + isort to backend (Docker)"
 	@echo "  make mobile-setup Install Expo/React Native dependencies"
 	@echo "  make mobile      Run Expo dev server"
 	@echo "  make mobile-android Run Expo on Android"
@@ -76,6 +79,15 @@ makemigrations:
 
 shell:
 	docker compose run --rm backend python manage.py shell
+
+test:
+	docker compose run --rm backend python manage.py test apps.users apps.lists apps.items -v 1
+
+lint:
+	docker compose run --rm backend sh -c "pip install --no-cache-dir -q -r requirements-dev.txt && flake8 apps config manage.py && black --check apps config manage.py && isort --check apps config manage.py"
+
+format:
+	docker compose run --rm backend sh -c "pip install --no-cache-dir -q -r requirements-dev.txt && black apps config manage.py && isort apps config manage.py"
 
 # ── New Mobile (Expo + React Native) ─────────────────────────────────────────
 

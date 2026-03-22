@@ -8,7 +8,9 @@ from apps.items.models import Category, Item, ItemHistory
 class ItemCreateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100)
     quantity = serializers.FloatField(default=1.0)
-    unit = serializers.CharField(max_length=20, required=False, allow_null=True, allow_blank=True)
+    unit = serializers.CharField(
+        max_length=20, required=False, allow_null=True, allow_blank=True
+    )
     note = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     category = serializers.IntegerField(required=False, allow_null=True)
 
@@ -35,7 +37,9 @@ class ItemCreateSerializer(serializers.Serializer):
 class ItemUpdateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100, required=False)
     quantity = serializers.FloatField(required=False)
-    unit = serializers.CharField(max_length=20, required=False, allow_null=True, allow_blank=True)
+    unit = serializers.CharField(
+        max_length=20, required=False, allow_null=True, allow_blank=True
+    )
     note = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     category = serializers.IntegerField(required=False, allow_null=True)
 
@@ -66,8 +70,12 @@ class ItemCheckSerializer(serializers.Serializer):
 class ItemReadSerializer(serializers.ModelSerializer):
     list_id = serializers.CharField(read_only=True)
     added_by = serializers.CharField(source="added_by_id", read_only=True)
-    checked_by = serializers.CharField(source="checked_by_id", read_only=True, allow_null=True)
-    category = serializers.IntegerField(source="category_id", read_only=True, allow_null=True)
+    checked_by = serializers.CharField(
+        source="checked_by_id", read_only=True, allow_null=True
+    )
+    category = serializers.IntegerField(
+        source="category_id", read_only=True, allow_null=True
+    )
 
     class Meta:
         model = Item

@@ -1,0 +1,10 @@
+[flake8]
+# Com Black: E203/E501 ignorados (formatação e comprimento de linha ficam com o Black)
+max-line-length = 88
+extend-ignore = E203, E501
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    */migrations/*,

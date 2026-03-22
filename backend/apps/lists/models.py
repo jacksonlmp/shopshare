@@ -13,10 +13,14 @@ def default_list_id() -> str:
 
 
 class ShoppingList(models.Model):
-    id = models.CharField(primary_key=True, default=default_list_id, editable=False, max_length=36)
+    id = models.CharField(
+        primary_key=True, default=default_list_id, editable=False, max_length=36
+    )
     name = models.CharField(max_length=100)
     share_code = models.CharField(max_length=6, unique=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owned_lists")
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="owned_lists"
+    )
     is_archived = models.BooleanField(default=False)
     # Stored as epoch ms in the current PostgreSQL schema (likely from Flutter migration).
     created_at = models.BigIntegerField(default=now_ms)
@@ -48,8 +52,12 @@ class ListMember(models.Model):
     ROLE_MEMBER = "member"
     ROLE_CHOICES = [(ROLE_OWNER, "Owner"), (ROLE_MEMBER, "Member")]
 
-    list = models.ForeignKey(ShoppingList, on_delete=models.CASCADE, related_name="memberships")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="list_memberships")
+    list = models.ForeignKey(
+        ShoppingList, on_delete=models.CASCADE, related_name="memberships"
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="list_memberships"
+    )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=ROLE_MEMBER)
     # Stored as epoch ms in the current PostgreSQL schema.
     joined_at = models.BigIntegerField(default=now_ms)

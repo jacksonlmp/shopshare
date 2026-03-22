@@ -56,7 +56,9 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://shopuser:shoppassword@localhost:5432/shopshare")
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgresql://shopuser:shoppassword@localhost:5432/shopshare"
+)
 
 if DATABASE_URL.startswith("postgres"):
     ENGINE = "django.db.backends.postgresql"
@@ -66,7 +68,11 @@ else:
 DATABASES = {
     "default": {
         "ENGINE": ENGINE,
-        "NAME": os.getenv("POSTGRES_DB", "shopshare") if ENGINE.endswith("postgresql") else BASE_DIR / "db.sqlite3",
+        "NAME": (
+            os.getenv("POSTGRES_DB", "shopshare")
+            if ENGINE.endswith("postgresql")
+            else BASE_DIR / "db.sqlite3"
+        ),
         "USER": os.getenv("POSTGRES_USER", "shopuser"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", "shoppassword"),
         "HOST": os.getenv("POSTGRES_HOST", "localhost"),

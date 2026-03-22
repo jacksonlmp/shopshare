@@ -47,7 +47,9 @@ def _detail_to_message(detail: Any) -> str:
     return str(detail)
 
 
-def custom_exception_handler(exc: Exception, context: dict[str, Any]) -> Response | None:
+def custom_exception_handler(
+    exc: Exception, context: dict[str, Any]
+) -> Response | None:
     response = drf_exception_handler(exc, context)
 
     if response is not None:

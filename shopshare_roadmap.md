@@ -117,10 +117,10 @@ Design: https://stitch.withgoogle.com/projects/515881793632764729?pli=1
 - [x] All write endpoints must validate the `X-User-Id` header and return 403 if membership check fails
 
 ### Testing
-- [ ] Test the full flow in Postman/Insomnia:
-  - [ ] Create user → create list → join list with a second user → add items → check items
-- [ ] Confirm `ItemHistory` is updated correctly after adding items
-- [ ] Create unit tests for each endpoint that was implemented
+- [x] Test the full flow in Postman/Insomnia **or** via automated tests (`make test`):
+  - [x] Create user → create list → join list with a second user → add items → check items
+- [x] Confirm `ItemHistory` is updated correctly after adding items
+- [x] Create unit tests for each endpoint that was implemented (`apps/users`, `apps/lists`, `apps/items` + integration flow in `apps/users/tests/test_integration_phase3.py`)
 
 ---
 

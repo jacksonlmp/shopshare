@@ -11,7 +11,16 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ("id", "list_id", "name", "quantity", "unit", "is_checked", "added_by_id", "checked_by_id")
+    list_display = (
+        "id",
+        "list_id",
+        "name",
+        "quantity",
+        "unit",
+        "is_checked",
+        "added_by_id",
+        "checked_by_id",
+    )
     list_filter = ("is_checked",)
     search_fields = ("name",)
 
@@ -20,4 +29,3 @@ class ItemAdmin(admin.ModelAdmin):
 class ItemHistoryAdmin(admin.ModelAdmin):
     list_display = ("id", "list_id", "item_name", "times_added", "last_used_at")
     search_fields = ("item_name",)
-

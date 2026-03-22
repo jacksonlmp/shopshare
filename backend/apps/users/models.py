@@ -14,7 +14,9 @@ def default_user_id() -> str:
 
 
 class User(models.Model):
-    id = models.CharField(primary_key=True, default=default_user_id, editable=False, max_length=36)
+    id = models.CharField(
+        primary_key=True, default=default_user_id, editable=False, max_length=36
+    )
     display_name = models.CharField(max_length=50)
     avatar_emoji = models.CharField(max_length=8)
     # Used later for push notifications / websocket identification.

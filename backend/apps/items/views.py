@@ -3,11 +3,11 @@ from __future__ import annotations
 from django.db import transaction
 from django.db.models import F
 from rest_framework import status
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.items.models import Category, Item, ItemHistory
+from apps.items.models import Item, ItemHistory
 from apps.items.serializers import (
     ItemCheckSerializer,
     ItemCreateSerializer,
@@ -17,9 +17,8 @@ from apps.items.serializers import (
 )
 from apps.lists.models import ShoppingList
 from apps.lists.permissions import IsItemMember, IsMember
-from config.identity import require_x_user_id
 from apps.users.models import now_ms
-from rest_framework.exceptions import PermissionDenied
+from config.identity import require_x_user_id
 
 
 def _get_item_or_404(item_id: str) -> Item:
@@ -109,7 +108,9 @@ class ItemDetailView(APIView):
         serializer.is_valid(raise_exception=True)
         validated = serializer.validated_data
 
-        category_id = validated.pop("category", None) if "category" in validated else None
+        category_id = (
+            validated.pop("category", None) if "category" in validated else None
+        )
 
         for field in ("name", "quantity", "unit", "note"):
             if field in validated:
@@ -130,7 +131,9 @@ class ItemDetailView(APIView):
         is_author = item.added_by_id == user_id
         is_list_owner = item.list.owner_id == user_id
         if not (is_author or is_list_owner):
-            raise PermissionDenied(detail="Only the item author or list owner can delete this item.")
+            raise PermissionDenied(
+                detail="Only the item author or list owner can delete this item."
+            )
 
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -146,4 +149,6 @@ class ItemSuggestionsView(APIView):
             .select_related("category")
             .order_by("-times_added", "-last_used_at")[:10]
         )
-        return Response(ItemSuggestionSerializer(qs, many=True).data, status=status.HTTP_200_OK)
+        return Response(
+            ItemSuggestionSerializer(qs, many=True).data, status=status.HTTP_200_OK
+        )

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from rest_framework.permissions import BasePermission
 from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.permissions import BasePermission
 
-from apps.items.models import Item, ItemHistory
+from apps.items.models import Item
 from apps.lists.models import ListMember, ShoppingList
 from config.identity import require_x_user_id
 
@@ -53,7 +53,9 @@ class IsItemMember(BasePermission):
         except Item.DoesNotExist:
             raise NotFound(detail="Item not found.")
 
-        if not ListMember.objects.filter(list_id=item.list_id, user_id=user_id).exists():
+        if not ListMember.objects.filter(
+            list_id=item.list_id, user_id=user_id
+        ).exists():
             raise PermissionDenied(detail=self.message)
 
         return True
@@ -84,7 +86,9 @@ class IsOwner(BasePermission):
             raise NotFound(detail="Item not found.")
 
         # Ensure user is part of the list group first.
-        if not ListMember.objects.filter(list_id=item.list_id, user_id=user_id).exists():
+        if not ListMember.objects.filter(
+            list_id=item.list_id, user_id=user_id
+        ).exists():
             raise PermissionDenied(detail=self.message)
 
         is_author = item.added_by_id == user_id
@@ -94,4 +98,3 @@ class IsOwner(BasePermission):
             raise PermissionDenied(detail=self.message)
 
         return True
-
