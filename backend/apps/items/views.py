@@ -17,6 +17,7 @@ from apps.items.serializers import (
 )
 from apps.lists.models import ShoppingList
 from apps.lists.permissions import IsItemMember, IsMember
+from apps.lists.ws_broadcast import broadcast_list_event
 from apps.users.models import now_ms
 from config.identity import require_x_user_id
 
@@ -72,7 +73,14 @@ class ItemAddView(APIView):
                 )
                 history.refresh_from_db()
 
-        return Response(ItemReadSerializer(item).data, status=status.HTTP_201_CREATED)
+        resp_data = ItemReadSerializer(item).data
+        broadcast_list_event(
+            list_id,
+            "item.added",
+            resp_data,
+            exclude_user_id=user_id,
+        )
+        return Response(resp_data, status=status.HTTP_201_CREATED)
 
 
 class ItemCheckView(APIView):
@@ -96,7 +104,14 @@ class ItemCheckView(APIView):
             item.checked_at = None
 
         item.save()
-        return Response(ItemReadSerializer(item).data, status=status.HTTP_200_OK)
+        resp_data = ItemReadSerializer(item).data
+        broadcast_list_event(
+            str(item.list_id),
+            "item.checked",
+            resp_data,
+            exclude_user_id=user_id,
+        )
+        return Response(resp_data, status=status.HTTP_200_OK)
 
 
 class ItemDetailView(APIView):
@@ -135,7 +150,15 @@ class ItemDetailView(APIView):
                 detail="Only the item author or list owner can delete this item."
             )
 
+        list_id = str(item.list_id)
+        item_pk = str(item.pk)
         item.delete()
+        broadcast_list_event(
+            list_id,
+            "item.deleted",
+            {"item_id": item_pk},
+            exclude_user_id=user_id,
+        )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

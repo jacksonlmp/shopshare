@@ -129,36 +129,28 @@ Design: https://stitch.withgoogle.com/projects/515881793632764729?pli=1
 > Goal: changes made by one member appear instantly on all other connected devices.
 
 ### Backend setup
-- [ ] Install and configure `channels` and `channels-redis` in `INSTALLED_APPS`
-- [ ] Set `ASGI_APPLICATION = 'core.asgi.application'` in `settings.py`
-- [ ] Configure the channel layer in `settings.py`:
-  ```python
-  CHANNEL_LAYERS = {
-      "default": {
-          "BACKEND": "channels_redis.core.RedisChannelLayer",
-          "CONFIG": { "hosts": [REDIS_URL] },
-      }
-  }
-  ```
-- [ ] Update `core/asgi.py` to route HTTP to Django and WebSocket to the consumer
-- [ ] Verify Redis is running and reachable from Django
+- [x] Install and configure `channels` and `channels-redis` in `INSTALLED_APPS` (+ `daphne` for ASGI server)
+- [x] Set `ASGI_APPLICATION = 'config.asgi.application'` in `settings.py` (repo uses `config/`, not `core/`)
+- [x] Configure the channel layer in `settings.py` (Redis via `REDIS_URL` in Docker; `InMemoryChannelLayer` when unset — e.g. tests)
+- [x] Update `config/asgi.py` to route HTTP to Django and WebSocket to `URLRouter(websocket_urlpatterns)`
+- [x] Verify Redis is running and reachable from Django (`redis` service in `docker-compose.yml`, `depends_on` + healthcheck)
 
 ### Consumer
-- [ ] Create `lists/consumers.py` with a `ListConsumer(AsyncWebsocketConsumer)`:
-  - [ ] `connect()`: validate membership, add to channel group `list_{list_id}`, accept connection
-  - [ ] `disconnect()`: remove from channel group
-  - [ ] `receive()`: parse incoming JSON event and route to the correct handler
-- [ ] Add the WebSocket URL pattern to `core/routing.py`:
+- [x] Create `apps/lists/consumers.py` with a `ListConsumer(AsyncWebsocketConsumer)`:
+  - [x] `connect()`: validate membership, add to channel group `list_{list_id}`, accept connection
+  - [x] `disconnect()`: remove from channel group
+  - [x] `receive()`: parse incoming JSON event (optional `event: ping` → `pong`)
+- [x] Add the WebSocket URL pattern to `config/routing.py`:
   ```
   ws://host/ws/lists/{list_id}/?user_id={user_id}
   ```
 
 ### Broadcast events
-- [ ] After `POST /items/` succeeds, broadcast `item.added` to the list group
-- [ ] After `PATCH /items/check/` succeeds, broadcast `item.checked` to the list group
-- [ ] After `DELETE /items/` succeeds, broadcast `item.deleted` to the list group
-- [ ] After `POST /lists/join/` succeeds, broadcast `member.joined` to the list group
-- [ ] Broadcast must exclude the originating user (no echo)
+- [x] After `POST /items/` succeeds, broadcast `item.added` to the list group
+- [x] After `PATCH /items/check/` succeeds, broadcast `item.checked` to the list group
+- [x] After `DELETE /items/` succeeds, broadcast `item.deleted` to the list group
+- [x] After `POST /lists/join/` succeeds, broadcast `member.joined` to the list group
+- [x] Broadcast must exclude the originating user (no echo)
 
 ### Event format
 All events must follow:

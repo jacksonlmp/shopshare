@@ -18,6 +18,7 @@ from apps.lists.serializers import (
     ShoppingListReadSerializer,
     ShoppingListSummarySerializer,
 )
+from apps.lists.ws_broadcast import broadcast_list_event
 from apps.users.models import User
 from config.api_exceptions import AlreadyListMember
 from config.identity import require_x_user_id
@@ -139,6 +140,18 @@ class ShoppingListJoinView(APIView):
             role=ListMember.ROLE_MEMBER,
         )
         shopping_list.refresh_from_db()
+        user = User.objects.get(pk=user_id)
+        broadcast_list_event(
+            str(shopping_list.pk),
+            "member.joined",
+            {
+                "user_id": user_id,
+                "display_name": user.display_name,
+                "avatar_emoji": user.avatar_emoji,
+                "role": ListMember.ROLE_MEMBER,
+            },
+            exclude_user_id=user_id,
+        )
         return Response(
             ShoppingListReadSerializer(shopping_list).data,
             status=status.HTTP_200_OK,

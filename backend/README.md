@@ -49,6 +49,17 @@ make backend-logs
 - `GET /api/schema/swagger-ui/` — Swagger UI (Phase 3)
 - `GET /api/docs/` — alias da Swagger UI (compatibilidade)
 
+## WebSocket (Phase 4)
+
+The stack runs **Daphne** (`config.asgi:application`) with **Channels** + **Redis** (channel layer) in Docker.
+
+- **URL:** `ws://localhost:8000/ws/lists/<list_id>/?user_id=<uuid>`  
+  (use the same UUID as `X-User-Id` for REST; user must already be a member of the list.)
+- **Events:** JSON messages shaped as `{ "event": "<name>", "payload": { ... } }` — e.g. `item.added`, `item.checked`, `item.deleted`, `member.joined`. Broadcasts skip the acting user (`exclude_user_id` on the server).
+- **Optional client ping:** send `{"event":"ping","payload":{}}` → server replies `pong`.
+
+`REDIS_URL` is set in `docker-compose.yml` for the backend. Without `REDIS_URL` (e.g. Django tests), the channel layer uses **InMemory** (no Redis required).
+
 ## Automated tests (Phase 3)
 
 From the repo root (requires Docker Compose + Postgres for the test DB):
@@ -86,4 +97,4 @@ make format
 ## Notes
 
 - Uses PostgreSQL connection settings from environment variables.
-- Current WebSocket layer is scaffold-ready through Channels ASGI entrypoint.
+- Compose includes **Redis** for WebSocket channel layers; API + WS are served by **Daphne**.
