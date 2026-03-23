@@ -2,14 +2,14 @@
 
 ## What is ShopShare?
 
-ShopShare is a **real-time shared shopping list mobile app**. The core idea is simple: families and groups can create a shopping list, share it with a 6-character code, and see everyone's updates instantly — no complicated sign-up required.
+ShopShare is a **real-time shared shopping list web app** (responsive for phones and desktops). The core idea is simple: families and groups can create a shopping list, share it with a 6-character code, and see everyone's updates instantly — no complicated sign-up required.
 
-A user opens the app, picks a name and an emoji avatar, creates or joins a list with a short code, and starts adding items. When someone at the supermarket checks off "Milk", everyone else in the group sees it crossed out in real time. The app works offline too, showing cached data when there's no signal and syncing automatically when the connection is restored.
+A user opens the site, picks a name and an emoji avatar, creates or joins a list with a short code, and starts adding items. When someone at the supermarket checks off "Milk", everyone else in the group sees it crossed out in real time. Offline-friendly behaviour (cache + sync) is a roadmap goal.
 
 **The stack:**
 - **Backend:** Django + Django REST Framework + Django Channels (WebSocket)
 - **Database:** PostgreSQL
-- **Mobile App:** React Native (iOS + Android)
+- **Frontend:** React (Vite + TypeScript) SPA
 - **Real-time:** WebSocket via Django Channels + Redis channel layer
 - **Infrastructure:** Docker + docker-compose
 
@@ -25,7 +25,7 @@ Design: https://stitch.withgoogle.com/projects/515881793632764729?pli=1
 - [x] Initialize with a `README.md` and a `.gitignore` for Python and Node
 - [x] Create the monorepo folder structure at the root:
   - [x] `backend/` — Django project
-  - [x] `app/` — React Native project
+  - [x] `frontend/` — React (Vite) web app
 - [x] Install Python 3.12+ and create a virtual environment inside `backend/`
 - [x] Install Django and project dependencies via `pip`:
 - [ ] Create `docker-compose.yml` at the root with:
@@ -165,81 +165,54 @@ All events must follow:
 
 ---
 
-## Phase 5 — React Native App
+## Phase 5 — React Web App (responsive)
 
-> Goal: all screens built, connected to the API and WebSocket, with working real-time sync.
+> Goal: responsive SPA (desktop + mobile browsers), connected to the API and WebSocket, with working real-time sync. No in-app purchases. Code lives in `frontend/` (Vite + TypeScript).
 
 ### Setup & dependencies
-- [ ] Install project dependencies:
-  - [x] `axios` — HTTP client
-  - [x] `@react-navigation/native` + `@react-navigation/native-stack` — navigation
-  - [x] `zustand` — state management
-  - [x] `@react-native-async-storage/async-storage` — local persistence
-  - [ ] `react-native-websocket` or native `WebSocket` API — real-time
-  - [ ] `react-native-mmkv` (optional) — faster local storage alternative
-- [ ] Create the base folder structure inside `app/src/`:
-  - [ ] `api/` — Axios instance and request functions
-  - [ ] `screens/` — screen components
-  - [ ] `components/` — reusable UI components
-  - [ ] `store/` — Zustand stores
-  - [ ] `hooks/` — custom hooks
-  - [ ] `navigation/` — navigator and route definitions
-  - [ ] `constants/` — colors, spacing, WS event names
+- [x] Install project dependencies (`frontend/package.json`): `axios`, `react-router-dom`, `zustand`, Vite + React + TypeScript
+- [x] `localStorage` — persist `user_id` / profile (replaces AsyncStorage)
+- [ ] Browser `WebSocket` API — real-time (see hooks below)
+- [x] Base folder structure under `frontend/src/`:
+  - [x] `api/` — Axios client + `X-User-Id` interceptor
+  - [x] `pages/` — routed screens
+  - [ ] `components/` — reusable UI (expand as features land)
+  - [x] `store/` — Zustand session store
+  - [ ] `hooks/` — custom hooks (e.g. `useListSync`)
+  - [ ] `constants/` — WS event names, spacing (optional)
 
 ### API layer
-- [ ] Create `api/client.js` with an Axios instance pointing to the backend base URL
-- [ ] Add a request interceptor that injects the `X-User-Id` header from AsyncStorage
-- [ ] Create individual service files: `usersApi.js`, `listsApi.js`, `itemsApi.js`
+- [x] Axios instance with `VITE_API_BASE_URL` (`frontend/src/api/client.ts`)
+- [x] Request interceptor: `X-User-Id` from `localStorage` when present
+- [ ] Service modules: `usersApi`, `listsApi`, `itemsApi` (optional split from inline calls)
 
 ### State management (Zustand)
-- [ ] Create `store/userStore.js` — current user (id, name, emoji)
-- [ ] Create `store/listStore.js` — active list data (members, items)
-- [ ] Create `store/uiStore.js` — loading states, error messages
+- [x] Session store — current user (id, name, emoji)
+- [ ] `listStore` — active list data (members, items)
+- [ ] `uiStore` — loading / errors
 
 ### Navigation
-- [ ] Configure `NavigationContainer` in `App.js`
-- [ ] Create a `RootNavigator` that checks AsyncStorage on launch:
-  - [ ] No `user_id` stored → navigate to `OnboardingScreen`
-  - [ ] `user_id` exists → navigate to `HomeScreen`
-- [ ] Define screens: `Onboarding`, `Home`, `List`
+- [x] `BrowserRouter` + routes: bootstrap from `localStorage`, `/onboarding` vs `/`
+- [ ] Additional routes: `List` / list detail
 
 ### Screens
-- [ ] **OnboardingScreen**
-  - [x] Text input for display name
-  - [x] Emoji picker (grid of selectable emojis)
-  - [x] On confirm: call `POST /api/users/`, save `user_id` to AsyncStorage, navigate to Home
-- [ ] **HomeScreen**
-  - [ ] List of groups the user already belongs to
-  - [ ] Button "New list" → modal with name input → call `POST /api/lists/`
-  - [ ] Input "Enter with code" → 6-character field → call `POST /api/lists/join/`
-  - [ ] Navigate to `ListScreen` after creating or joining
-- [ ] **ListScreen**
-  - [ ] Header with list name, share code (copy button), and member avatars
-  - [ ] Items grouped by category, each with a checkbox
-  - [ ] Checkbox tap → optimistic update → call `PATCH /api/items/{id}/check/`
-  - [ ] Swipe to delete item → call `DELETE /api/items/{id}/`
-  - [ ] FAB (floating button) → open `AddItemSheet`
-- [ ] **AddItemSheet** (bottom sheet)
-  - [ ] Fields: item name, quantity, unit (dropdown), category (chip selector), optional note
-  - [ ] Suggestions row showing frequent items from `GET /api/lists/{id}/suggestions/`
-  - [ ] On confirm: call `POST /api/lists/{id}/items/`
+- [x] **Onboarding** — name + emoji → `POST /api/users/` → `localStorage` → Home
+- [ ] **Home** — lists the user belongs to; create list; join by code
+- [ ] **List** — items, check, delete, add item, suggestions
+- [ ] Responsive layout (CSS; mobile-first)
 
 ### WebSocket integration
-- [ ] Create `hooks/useListSync.js` that:
-  - [ ] Connects to `ws://host/ws/lists/{listId}/?user_id={userId}` when the screen mounts
-  - [ ] Disconnects when the screen unmounts
-  - [ ] Implements exponential backoff reconnection (1s → 2s → 4s → up to 60s)
-  - [ ] Parses incoming events and updates the Zustand `listStore` accordingly:
-    - [ ] `item.added` → append item to the list
-    - [ ] `item.checked` → update `is_checked` on the matching item
-    - [ ] `item.deleted` → remove item from the list
-    - [ ] `member.joined` → add new member to the members list
-- [ ] Apply `useListSync` in `ListScreen`
+- [ ] Create `hooks/useListSync.ts` that:
+  - [ ] Connects to `ws(s)://host/ws/lists/{listId}/?user_id={userId}` (use `src/utils/wsUrl.ts`)
+  - [ ] Disconnects on unmount
+  - [ ] Exponential backoff reconnection (1s → … → 60s cap)
+  - [ ] Dispatch events into `listStore`: `item.added`, `item.checked`, `item.deleted`, `member.joined`
+- [ ] Use `useListSync` on the list page
 
 ### Offline support
-- [ ] Cache list data to AsyncStorage every time the listStore updates
-- [ ] On screen load, show cached data immediately while the API fetch is in progress
-- [ ] Display a "No connection" banner when the device is offline
+- [ ] Cache list data (e.g. `localStorage` or IndexedDB) when `listStore` updates
+- [ ] Stale-while-revalidate on load
+- [ ] Offline banner (`navigator.onLine` / events)
 
 ---
 
@@ -259,10 +232,10 @@ All events must follow:
   - [ ] Set all environment variables in the platform dashboard
   - [ ] Run migrations on deploy (`python manage.py migrate`)
   - [ ] Confirm the WebSocket endpoint is reachable (check WSS support)
-- [ ] Update the Axios `baseURL` and WebSocket URL in the app to point to production
-- [ ] Build the Android APK: `npx react-native build-android --mode=release`
-- [ ] Install the APK on a physical device and test the full flow end-to-end
+- [ ] Update `VITE_API_BASE_URL` / `VITE_WS_BASE_URL` for production
+- [ ] Build and deploy the SPA (`npm run build` in `frontend/`, serve `dist/` via CDN or static host)
+- [ ] Smoke-test the full flow on desktop and a mobile browser
 
 ---
 
-*Version: 2.0 | Stack: Django + React Native | Updated: March 2026*
+*Version: 2.1 | Stack: Django + React (web) | Updated: March 2026*

@@ -98,3 +98,4 @@ make format
 
 - Uses PostgreSQL connection settings from environment variables.
 - Compose includes **Redis** for WebSocket channel layers; API + WS are served by **Daphne**.
+- The **web SPA** lives in [`../frontend/`](../frontend/) (Vite + React). In development, `CORS_ALLOW_ALL_ORIGINS` is typically true; in production, restrict origins to your deployed frontend URL and use **HTTPS** / **WSS**.

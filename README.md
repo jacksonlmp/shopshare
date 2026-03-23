@@ -1,36 +1,57 @@
 # ShopShare
 
-ShopShare is now maintained with the following stacks only:
+ShopShare is a **responsive web** product (SaaS-style UX): shared shopping lists with a Django API and a **React (Vite + TypeScript)** single-page app. There are **no in-app purchases** in this codebase.
 
-- Django backend in `backend/`
-- React Native (Expo + TypeScript) mobile app in `mobile/`
-
-## Repository Structure
+## Repository structure
 
 | Folder | Description |
-|---|---|
-| `backend/` | Django + DRF API backend (Docker) |
-| `mobile/` | React Native app with Expo |
+|--------|-------------|
+| `backend/` | Django + DRF + Channels (Docker) |
+| `frontend/` | React SPA (Vite + TypeScript) |
 
-## Quick Start
+## Quick start
 
 ```bash
-# 1) Start PostgreSQL
-make up
+# 1) Install frontend deps (once)
+make frontend-setup
 
 # 2) Build images and run migrations
 make dev-setup
 
-# 3) Start mobile (backend already in Docker)
+# 3) Run backend (Docker) + Vite on your machine (hot reload)
 make dev
 ```
 
-## Useful Commands
+- **API:** http://localhost:8000  
+- **App:** http://localhost:5173  
+- **Health:** http://localhost:8000/health/
 
-- `make up` — start backend and database via Docker
-- `make migrate` — run Django migrations inside Docker
-- `make backend-logs` — tail Django container logs
-- `make mobile` — start Expo dev server
-- `make mobile-android` — run Expo on Android
-- `make mobile-ios` — run Expo on iOS
-- `make mobile-web` — run Expo on Web
+Copy [`frontend/.env.example`](frontend/.env.example) to `frontend/.env` if you need to override `VITE_API_BASE_URL`.
+
+### Full stack in Docker only
+
+```bash
+make build
+make up
+```
+
+Opens the same URLs; the `frontend` service runs Vite inside Docker (see [`docker-compose.yml`](docker-compose.yml)).
+
+## Useful commands
+
+| Command | Description |
+|---------|-------------|
+| `make up` | Start backend, Postgres, Redis, and frontend (Vite) containers |
+| `make down` | Stop containers |
+| `make migrate` | Django migrations in Docker |
+| `make test` | Backend API tests |
+| `make lint` / `make format` | Backend Python lint / format |
+| `make frontend` | Local Vite dev server |
+| `make frontend-build` | Production build of the SPA (`frontend/dist`) |
+| `make frontend-lint` / `make frontend-format` | Frontend ESLint / Prettier |
+
+See [`backend/README.md`](backend/README.md) and [`frontend/README.md`](frontend/README.md) for details.
+
+## Roadmap
+
+Product and technical notes live in [`shopshare_roadmap.md`](shopshare_roadmap.md).
