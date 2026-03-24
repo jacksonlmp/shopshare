@@ -60,7 +60,7 @@ function navButtonClass(active: boolean, compact?: boolean): string {
 
 export function LandingPage() {
   const user = useSessionStore((s) => s.user);
-  const appHref = user ? '/home' : '/onboarding';
+  const appHref = user ? '/home' : '/login';
   const [activeNav, setActiveNav] = useState<NavSectionId | null>(null);
 
   const scrollToSection = useCallback((id: NavSectionId) => {

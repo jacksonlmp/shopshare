@@ -4,22 +4,22 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ThemeSync } from './components/ThemeSync';
 import { HomePage } from './pages/HomePage';
 import { LandingPage } from './pages/LandingPage';
-import { OnboardingPage } from './pages/OnboardingPage';
+import { LoginPage } from './pages/LoginPage';
 import { getStoredUser } from './services/storage';
 import { useSessionStore } from './store/useSessionStore';
 
-function OnboardingGate() {
+function LoginGate() {
   const user = useSessionStore((s) => s.user);
   if (user) {
     return <Navigate to="/home" replace />;
   }
-  return <OnboardingPage />;
+  return <LoginPage />;
 }
 
 function HomeGate() {
   const user = useSessionStore((s) => s.user);
   if (!user) {
-    return <Navigate to="/onboarding" replace />;
+    return <Navigate to="/login" replace />;
   }
   return <HomePage />;
 }
@@ -53,7 +53,8 @@ export default function App() {
       <ThemeSync />
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/onboarding" element={<OnboardingGate />} />
+        <Route path="/login" element={<LoginGate />} />
+        <Route path="/onboarding" element={<Navigate to="/login" replace />} />
         <Route path="/home" element={<HomeGate />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
