@@ -192,11 +192,11 @@ All events must follow:
 - [ ] `uiStore` — loading / errors
 
 ### Navigation
-- [x] `BrowserRouter` + routes: bootstrap from `localStorage`, `/onboarding` vs `/`
+- [x] `BrowserRouter` + routes: bootstrap from `localStorage`, `/login` vs `/`
 - [ ] Additional routes: `List` / list detail
 
 ### Screens
-- [x] **Onboarding** — name + emoji → `POST /api/users/` → `localStorage` → Home
+- [x] **Login (apelido + avatar)** — `POST /api/users/` → `localStorage` → Home (`/login`)
 - [ ] **Home** — lists the user belongs to; create list; join by code
 - [ ] **List** — items, check, delete, add item, suggestions
 - [ ] Responsive layout (CSS; mobile-first)

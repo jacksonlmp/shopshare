@@ -39,15 +39,16 @@ The repo root `docker-compose.yml` includes a `frontend` service that runs `npm 
 | Path | Description |
 |------|-------------|
 | `/` | Landing page (marketing — design alinhado ao [Stitch](https://stitch.withgoogle.com/projects/515881793632764729)) |
-| `/onboarding` | Criar perfil (`POST /api/users/`) |
-| `/home` | Área autenticada (stub) |
+| `/login` | Entrar — apelido + avatar (`POST /api/users/`) |
+| `/home` | Dashboard — listas (`GET/POST /api/lists/`), entrar por código, cartões bento ([Stitch — painel](https://stitch.withgoogle.com/projects/515881793632764729?node-id=a7fde7328edf41d99cef56bf0f05ffa6)) |
+| `/lists/:listId` | Detalhe da lista (itens + código) |
 
 ## Structure
 
 - `src/api/` — Axios client (`X-User-Id` from `localStorage` when present)
 - `src/services/` — `localStorage` session helpers
 - `src/store/` — Zustand session store
-- `src/pages/` — `LandingPage`, `OnboardingPage`, `HomePage`
+- `src/pages/` — `LandingPage`, `LoginPage`, `HomePage`, `ListDetailPage`
 - `src/utils/wsUrl.ts` — WebSocket URL builder for Phase 4
 
 **UI:** Tailwind CSS v4 (`@tailwindcss/vite`). O sistema visual segue **[`DESIGN.md`](DESIGN.md)** (Ethereal Boutique): superfícies em camadas, sombra “Purple Dusk”, gradiente 135° nos CTAs, **Manrope** (títulos) + **Inter** (corpo), chips e formulários sem bordas duras. Material Symbols no `index.html`.
