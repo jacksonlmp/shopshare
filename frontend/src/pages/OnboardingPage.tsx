@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
+import { ThemeToggle } from '../components/ThemeToggle';
 import { api } from '../api/client';
 import { saveStoredUser } from '../services/storage';
 import { useSessionStore } from '../store/useSessionStore';
-import { colors } from '../theme/colors';
 
 const emojis = ['😀', '😎', '🧠', '🎯', '🚀', '🛒'];
 
@@ -20,7 +20,7 @@ export function OnboardingPage() {
   async function submit(): Promise<void> {
     const trimmed = displayName.trim();
     if (!trimmed) {
-      setError('Please enter your name.');
+      setError('Indique o seu nome.');
       return;
     }
     setError(null);
@@ -39,75 +39,75 @@ export function OnboardingPage() {
 
       saveStoredUser(user);
       setUser(user);
-      navigate('/', { replace: true });
+      navigate('/home', { replace: true });
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;
         const details = status ? `HTTP ${status}` : err.message;
-        setError(`Failed to create user. ${details}`);
+        setError(`Não foi possível criar o utilizador. ${details}`);
         return;
       }
-      setError('Failed to create user.');
+      setError('Não foi possível criar o utilizador.');
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="page onboarding-page">
-      <div className="page-inner">
-        <h1 className="title" style={{ color: colors.textPrimary }}>
-          Welcome to ShopShare
-        </h1>
-        <p className="subtitle" style={{ color: colors.textSecondary }}>
-          Pick a name and an avatar to start.
+    <div className="page-ethereal onboarding-page">
+      <div className="page-ethereal-inner">
+        <div className="mb-4 flex w-full items-start justify-between gap-3">
+          <p className="ethereal-muted mb-0">
+            <Link to="/" className="ethereal-link">
+              ← Voltar ao site
+            </Link>
+          </p>
+          <ThemeToggle className="shrink-0" />
+        </div>
+        <h1 className="ethereal-title">Criar o seu perfil</h1>
+        <p className="ethereal-subtitle">
+          Escolha um nome e um emoji para começar a usar o ShopShare.
         </p>
 
         {error ? (
-          <p className="form-error" role="alert">
+          <p className="ethereal-error" role="alert">
             {error}
           </p>
         ) : null}
 
         <label className="sr-only" htmlFor="display-name">
-          Your name
+          O seu nome
         </label>
         <input
           id="display-name"
-          className="text-input"
+          className="ethereal-input"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
-          placeholder="Your name"
+          placeholder="O seu nome"
           autoComplete="nickname"
-          style={{
-            backgroundColor: colors.surface,
-            border: `1px solid ${colors.cardBorder}`,
-            color: colors.textPrimary,
-          }}
         />
 
-        <div className="emoji-row" aria-label="Choose avatar emoji">
+        <div className="ethereal-emoji-row" aria-label="Escolher emoji de avatar">
           {emojis.map((emoji) => (
             <button
               key={emoji}
               type="button"
-              className={`emoji-button ${avatarEmoji === emoji ? 'emoji-button-active' : ''}`}
+              className={`ethereal-emoji-btn ${avatarEmoji === emoji ? 'ethereal-emoji-btn-active' : ''}`}
               onClick={() => setAvatarEmoji(emoji)}
               aria-pressed={avatarEmoji === emoji}
             >
-              <span className="emoji-char">{emoji}</span>
+              <span className="ethereal-emoji-char">{emoji}</span>
             </button>
           ))}
         </div>
 
         <button
           type="button"
-          className="primary-button"
+          className="ethereal-submit"
           onClick={() => void submit()}
           disabled={submitting}
-          style={{ backgroundColor: colors.primary, color: colors.textPrimary }}
         >
-          {submitting ? '…' : 'Continue'}
+          {submitting ? '…' : 'Continuar'}
         </button>
       </div>
     </div>

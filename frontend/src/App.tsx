@@ -1,16 +1,17 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
+import { ThemeSync } from './components/ThemeSync';
 import { HomePage } from './pages/HomePage';
+import { LandingPage } from './pages/LandingPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { getStoredUser } from './services/storage';
 import { useSessionStore } from './store/useSessionStore';
-import { colors } from './theme/colors';
 
 function OnboardingGate() {
   const user = useSessionStore((s) => s.user);
   if (user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/home" replace />;
   }
   return <OnboardingPage />;
 }
@@ -25,9 +26,9 @@ function HomeGate() {
 
 function BootstrappingScreen() {
   return (
-    <div className="app-loading" style={{ backgroundColor: colors.background }}>
-      <div className="spinner" style={{ borderColor: colors.primary }} aria-busy />
-      <span className="sr-only">Loading</span>
+    <div className="app-loading">
+      <div className="spinner" aria-busy />
+      <span className="sr-only">A carregar</span>
     </div>
   );
 }
@@ -49,9 +50,11 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <ThemeSync />
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/onboarding" element={<OnboardingGate />} />
-        <Route path="/" element={<HomeGate />} />
+        <Route path="/home" element={<HomeGate />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

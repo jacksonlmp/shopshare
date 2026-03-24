@@ -1,20 +1,28 @@
+import { Link } from 'react-router-dom';
+
+import { ThemeToggle } from '../components/ThemeToggle';
 import { useSessionStore } from '../store/useSessionStore';
-import { colors } from '../theme/colors';
 
 export function HomePage() {
   const user = useSessionStore((s) => s.user);
 
   return (
-    <div className="page home-page">
-      <div className="page-inner">
-        <h1 className="title" style={{ color: colors.textPrimary }}>
-          Home
-        </h1>
-        <p className="subtitle" style={{ color: colors.textPrimary }}>
-          Signed in as {user?.avatarEmoji} {user?.displayName}
+    <div className="page-ethereal home-page">
+      <div className="page-ethereal-inner">
+        <div className="mb-4 flex w-full items-start justify-between gap-3">
+          <p className="ethereal-muted mb-0">
+            <Link to="/" className="ethereal-link">
+              ← Voltar ao site
+            </Link>
+          </p>
+          <ThemeToggle className="shrink-0" />
+        </div>
+        <h1 className="ethereal-title">Início</h1>
+        <p className="ethereal-subtitle !text-on-surface">
+          Sessão: {user?.avatarEmoji} {user?.displayName}
         </p>
-        <p className="muted" style={{ color: colors.textSecondary }}>
-          Next step: your shopping lists and items (see roadmap).
+        <p className="ethereal-muted">
+          Próximo passo: listas e itens (ver roadmap).
         </p>
       </div>
     </div>

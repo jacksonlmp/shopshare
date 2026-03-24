@@ -1,15 +1,358 @@
+@import 'tailwindcss';
+
+/*
+ * ShopShare — Ethereal Boutique
+ * @see frontend/DESIGN.md
+ * Surfaces, typography (Manrope + Inter), ambient shadows, no harsh borders.
+ */
+@theme {
+  --font-headline: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: #fcf4ff;
+  --color-surface: #fcf4ff;
+  --color-on-surface: #37274d;
+  --color-on-surface-variant: #66547d;
+  --color-primary: #652fe7;
+  --color-primary-dim: #5819db;
+  --color-on-primary: #f7f0ff;
+  --color-primary-container: #a98fff;
+  --color-on-primary-container: #280072;
+  --color-primary-fixed-dim: #9c7eff;
+  --color-tertiary: #9c3660;
+  --color-surface-container: #f2e2ff;
+  --color-surface-container-low: #f8edff;
+  --color-surface-container-high: #eedcff;
+  --color-surface-container-highest: #e9d5ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-outline-variant: #baa4d3;
+  --color-error: #b41340;
+  --color-error-container: #f74b6d;
+
+  /* DESIGN.md radii: sm 0.5rem, md 1.5rem, lg 2rem, xl 3rem */
+  --radius-sm: 0.5rem;
+  --radius-md: 1.5rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+
+  --shadow-ambient: 0 20px 40px rgba(101, 47, 231, 0.06);
+  --shadow-cta: 0 20px 40px rgba(101, 47, 231, 0.14);
+  --shadow-cta-hover: 0 28px 52px rgba(101, 47, 231, 0.12);
+
+  /* Glass nav — valor base claro; escuro em `html[data-theme="dark"]` */
+  --glass-nav-bg: rgb(252 244 255 / 0.8);
+}
+
+/* Purple Dusk — floating elements only (DESIGN §4) */
+@utility shadow-ambient {
+  box-shadow: var(--shadow-ambient);
+}
+
+@utility shadow-cta {
+  box-shadow: var(--shadow-cta);
+}
+
+@utility shadow-cta-hover {
+  box-shadow: var(--shadow-cta-hover);
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+/* Primary CTA: 135° jewel gradient + tactile hover (DESIGN §2–§5) */
+.btn-primary-jewel {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dim) 100%);
+  color: var(--color-on-primary);
+  border-radius: var(--radius-xl);
+  font-family: var(--font-headline);
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: var(--shadow-cta);
+}
+
+.btn-primary-jewel:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-cta-hover);
+}
+
+.btn-primary-jewel:focus-visible {
+  outline: 2px solid var(--color-primary-container);
+  outline-offset: 3px;
+}
+
+/* Glass nav: surface @ 80% + 20px blur (DESIGN §2) */
+.glass-nav {
+  background: var(--glass-nav-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-ambient);
+}
+
+/*
+ * Tema escuro — mesma hierarquia semântica que o claro (DESIGN.md §2 + §7 Dark).
+ * Sem preto puro; violetas profundos e texto em lavanda.
+ */
+html[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-background: #120e18;
+  --color-surface: #120e18;
+  --color-on-surface: #ebe3f7;
+  --color-on-surface-variant: #a89bb8;
+  --color-primary: #8b6cff;
+  --color-primary-dim: #6b46f0;
+  --color-on-primary: #f7f0ff;
+  --color-primary-container: #5a4a8c;
+  --color-on-primary-container: #e8deff;
+  --color-primary-fixed-dim: #7b64d4;
+  --color-tertiary: #d17a9e;
+  --color-surface-container: #1a1524;
+  --color-surface-container-low: #201a2c;
+  --color-surface-container-high: #2d2640;
+  --color-surface-container-highest: #3a3150;
+  --color-surface-container-lowest: #2a2338;
+  --color-outline-variant: #5c4f6e;
+  --color-error: #ffb3c1;
+  --color-error-container: #5c2535;
+
+  --shadow-ambient: 0 20px 40px rgba(101, 47, 231, 0.18);
+  --shadow-cta: 0 20px 44px rgba(139, 108, 255, 0.28);
+  --shadow-cta-hover: 0 28px 56px rgba(139, 108, 255, 0.22);
+
+  --glass-nav-bg: rgb(18 14 24 / 0.82);
+}
+
+/* Ghost border when same-tone surfaces meet (DESIGN §4) */
+.border-ghost {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-outline-variant) 15%, transparent);
+}
+
+/* Curator / metadata chip (DESIGN §5) */
+.curator-chip {
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-primary-fixed-dim) 28%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+/* Display headline scale (DESIGN §3) */
+.display-hero {
+  font-family: var(--font-headline);
+  font-weight: 800;
+  color: var(--color-on-surface);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+/* Secondary nav pill — no 1px section borders (DESIGN §2) */
+.nav-link-active {
+  background-color: var(--color-surface-container-high);
+  color: var(--color-primary);
+  border-radius: 9999px;
+  padding: 0.35rem 0.85rem;
+}
+
+.nav-link-quiet {
+  color: var(--color-on-surface-variant);
+  border-radius: 9999px;
+  padding: 0.35rem 0.85rem;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.nav-link-quiet:hover {
+  color: var(--color-primary);
+  background-color: color-mix(in srgb, var(--color-surface-container-high) 50%, transparent);
+}
+
+/* Secondary button: surface-container-high, primary text, no border (DESIGN §5) */
+.btn-secondary-surface {
+  background-color: var(--color-surface-container-high);
+  color: var(--color-primary);
+  font-family: var(--font-headline);
+  font-weight: 700;
+  border-radius: var(--radius-xl);
+  border: none;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  box-shadow: var(--shadow-ambient);
+}
+
+.btn-secondary-surface:hover {
+  transform: scale(1.02);
+}
+
+/* ── App shell: onboarding / home (light Ethereal Boutique) ── */
+.page-ethereal {
+  min-height: 100dvh;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-surface);
+  font-family: var(--font-body);
+  color: var(--color-on-surface);
+}
+
+.page-ethereal-inner {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.page-ethereal .ethereal-title {
+  font-family: var(--font-headline);
+  font-size: clamp(1.5rem, 5vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-on-surface);
+  margin: 0;
+}
+
+.page-ethereal .ethereal-subtitle,
+.page-ethereal .ethereal-muted {
+  font-family: var(--font-body);
+  color: var(--color-on-surface-variant);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.page-ethereal .ethereal-muted {
+  font-size: 0.95rem;
+}
+
+.page-ethereal a.ethereal-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.page-ethereal a.ethereal-link:hover {
+  border-bottom-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+.page-ethereal .ethereal-input {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-container-highest);
+  color: var(--color-on-surface);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-outline-variant) 15%, transparent);
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.page-ethereal .ethereal-input::placeholder {
+  color: color-mix(in srgb, var(--color-on-surface-variant) 65%, transparent);
+}
+
+.page-ethereal .ethereal-input:focus {
+  outline: none;
+  background: var(--color-surface-container-lowest);
+  box-shadow: inset 0 0 0 2px var(--color-primary-container);
+}
+
+.page-ethereal .ethereal-emoji-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.page-ethereal .ethereal-emoji-btn {
+  width: 3rem;
+  height: 3rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container-high);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-outline-variant) 15%, transparent);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.15s ease;
+}
+
+.page-ethereal .ethereal-emoji-btn:hover {
+  transform: scale(1.05);
+}
+
+.page-ethereal .ethereal-emoji-btn-active {
+  box-shadow: 0 0 0 2px var(--color-primary-container);
+  background: var(--color-surface-container-lowest);
+}
+
+.page-ethereal .ethereal-emoji-char {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.page-ethereal .ethereal-submit {
+  margin-top: 0.25rem;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  font-family: var(--font-headline);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dim) 100%);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-cta);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.page-ethereal .ethereal-submit:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-cta-hover);
+}
+
+.page-ethereal .ethereal-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.page-ethereal .ethereal-error {
+  color: var(--color-error);
+  font-size: 0.9rem;
+  margin: 0;
+  background: color-mix(in srgb, var(--color-error-container) 10%, transparent);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+}
+
+/* Legacy loading spinner (still on-surface boutique) */
 :root {
-  font-family:
-    system-ui,
-    -apple-system,
-    Segoe UI,
-    Roboto,
-    sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color-scheme: dark;
-  background-color: #0f0f1a;
-  color: #ffffff;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -22,6 +365,7 @@
 body {
   margin: 0;
   min-height: 100dvh;
+  font-family: var(--font-body);
 }
 
 #root {
@@ -45,13 +389,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: var(--color-surface);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
   border: 3px solid transparent;
-  border-top-color: currentColor;
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -59,121 +404,5 @@ body {
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-.page {
-  min-height: 100dvh;
-  padding: clamp(16px, 4vw, 32px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #0f0f1a;
-}
-
-.page-inner {
-  width: 100%;
-  max-width: 420px;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.title {
-  font-size: clamp(1.5rem, 5vw, 1.75rem);
-  font-weight: 700;
-  margin: 0;
-}
-
-.subtitle {
-  font-size: 1rem;
-  margin: 0 0 0.5rem;
-}
-
-.muted {
-  font-size: 0.95rem;
-  margin: 0;
-}
-
-.form-error {
-  color: #f87171;
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-.text-input {
-  width: 100%;
-  padding: 14px 16px;
-  font-size: 1rem;
-  border-radius: 12px;
-  border: 1px solid var(--input-border, #2a2a45);
-  background: var(--input-bg, #1a1a2e);
-  color: var(--input-color, #fff);
-}
-
-.text-input::placeholder {
-  color: #8888aa;
-}
-
-.text-input:focus {
-  outline: 2px solid #7b6ef6;
-  outline-offset: 0;
-}
-
-.emoji-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.emoji-button {
-  width: 48px;
-  height: 48px;
-  border-radius: 24px;
-  border: 1px solid #2a2a45;
-  background: #1e1e30;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition:
-    border-color 0.15s,
-    transform 0.1s;
-}
-
-.emoji-button:hover {
-  transform: scale(1.05);
-}
-
-.emoji-button-active {
-  border-color: #7b6ef6;
-  box-shadow: 0 0 0 1px #7b6ef6;
-}
-
-.emoji-char {
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.primary-button {
-  margin-top: 0.5rem;
-  width: 100%;
-  padding: 14px 16px;
-  font-size: 1rem;
-  font-weight: 700;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-}
-
-.primary-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-@media (min-width: 600px) {
-  .page-inner {
-    max-width: 480px;
   }
 }
