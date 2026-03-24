@@ -88,6 +88,13 @@
   outline-offset: 3px;
 }
 
+/* Dashboard — cartão bento primário (Stitch / DESIGN §2) */
+.surface-bento-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dim) 100%);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-cta);
+}
+
 /* Glass nav: surface @ 80% + 20px blur (DESIGN §2) */
 .glass-nav {
   background: var(--glass-nav-bg);

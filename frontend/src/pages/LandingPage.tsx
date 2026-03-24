@@ -157,8 +157,8 @@ export function LandingPage() {
   );
 
   return (
-    <div className="font-body bg-surface text-on-surface flex min-h-screen flex-col overflow-x-hidden antialiased">
-      <header className="glass-nav fixed top-0 z-50 w-full">
+    <div className="font-body flex min-h-screen flex-col overflow-x-hidden bg-surface text-on-surface antialiased">
+      <header className="glass-nav fixed top-0 z-[60] w-full">
         <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-4 sm:h-[4.5rem] sm:px-8">
           <Link
             to="/"
