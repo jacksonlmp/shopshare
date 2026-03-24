@@ -10,11 +10,18 @@ from apps.lists.models import ListMember, ShoppingList
 class ShoppingListCreateSerializer(serializers.ModelSerializer):
     """POST /api/lists/ — owner comes from `X-User-Id`."""
 
+    description = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+    )
+
     class Meta:
         model = ShoppingList
         fields = [
             "id",
             "name",
+            "description",
             "share_code",
             "owner_id",
             "is_archived",
@@ -22,6 +29,9 @@ class ShoppingListCreateSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "share_code", "owner_id", "created_at", "updated_at"]
+
+    def validate_description(self, value: str | None) -> str:
+        return "" if value is None else value
 
     def create(self, validated_data: dict) -> ShoppingList:
         owner_id = self.context["owner_id"]
@@ -45,12 +55,23 @@ class ShoppingListReadSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "description",
             "share_code",
             "owner_id",
             "is_archived",
             "created_at",
             "updated_at",
         ]
+
+
+class ShoppingListInvitePreviewSerializer(serializers.ModelSerializer):
+    """GET público por share_code — convite por link (sem autenticação)."""
+
+    owner_display_name = serializers.CharField(source="owner.display_name", read_only=True)
+
+    class Meta:
+        model = ShoppingList
+        fields = ["name", "description", "share_code", "owner_display_name"]
 
 
 class ShoppingListSummarySerializer(serializers.ModelSerializer):
@@ -64,6 +85,7 @@ class ShoppingListSummarySerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "description",
             "share_code",
             "owner_id",
             "is_archived",
@@ -125,6 +147,7 @@ class ShoppingListDetailSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "name",
+            "description",
             "share_code",
             "owner_id",
             "is_archived",
@@ -136,9 +159,18 @@ class ShoppingListDetailSerializer(serializers.ModelSerializer):
 
 
 class ShoppingListPatchSerializer(serializers.ModelSerializer):
+    description = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+    )
+
     class Meta:
         model = ShoppingList
-        fields = ["name", "is_archived"]
+        fields = ["name", "description", "is_archived"]
+
+    def validate_description(self, value: str | None) -> str:
+        return "" if value is None else value
 
 
 class JoinListSerializer(serializers.Serializer):

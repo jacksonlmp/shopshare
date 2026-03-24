@@ -3,6 +3,7 @@ import string
 import uuid
 
 from django.db import models
+from django.db.models import Value
 
 from apps.users.models import User, now_ms
 
@@ -17,6 +18,11 @@ class ShoppingList(models.Model):
         primary_key=True, default=default_list_id, editable=False, max_length=36
     )
     name = models.CharField(max_length=100)
+    description = models.TextField(
+        blank=True,
+        default="",
+        db_default=Value(""),
+    )
     share_code = models.CharField(max_length=6, unique=True)
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="owned_lists"
@@ -33,6 +39,9 @@ class ShoppingList(models.Model):
         return "".join(random.choices(string.ascii_uppercase, k=6))
 
     def save(self, *args, **kwargs):
+        # API/clients may send null; DB column is NOT NULL — store empty string.
+        if self.description is None:
+            self.description = ""
         # Auto-generate a unique code if not provided.
         if not self.share_code:
             for _ in range(10):

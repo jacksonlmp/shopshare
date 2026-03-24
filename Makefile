@@ -18,6 +18,7 @@ help:
 	@echo "  make migrate       Run Django migrations in Docker"
 	@echo "  make makemigrations Generate Django migrations in Docker"
 	@echo "  make shell         Open Django shell in Docker"
+	@echo "  make seed-invite-demo  Lista demo + código INVITE (link /invite/INVITE)"
 	@echo "  make test          Run Django API tests in Docker"
 	@echo "  make lint          Backend: flake8 + black --check + isort --check"
 	@echo "  make format        Backend: black + isort"
@@ -76,6 +77,9 @@ makemigrations:
 
 shell:
 	docker compose run --rm backend python manage.py shell
+
+seed-invite-demo:
+	docker compose run --rm backend python manage.py seed_invite_demo
 
 test:
 	docker compose run --rm backend python manage.py test apps.users apps.lists apps.items -v 1

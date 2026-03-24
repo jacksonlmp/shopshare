@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ThemeToggle } from '../components/ThemeToggle';
 import { api } from '../api/client';
 import { saveStoredUser } from '../services/storage';
 import { useSessionStore } from '../store/useSessionStore';
+import { resolvePostLoginRedirect } from '../utils/safeRedirect';
 
 /** Avatares — alinhado ao grid Stitch (5 colunas). */
 const AVATAR_EMOJIS = ['😊', '🦊', '🐼', '🥑', '🚀', '😎', '🐱', '👾', '🦄', '🛒'] as const;
@@ -17,6 +18,7 @@ export function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
   const setUser = useSessionStore((s) => s.setUser);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   async function submit(e: FormEvent): Promise<void> {
     e.preventDefault();
@@ -41,7 +43,7 @@ export function LoginPage() {
 
       saveStoredUser(user);
       setUser(user);
-      navigate('/home', { replace: true });
+      navigate(resolvePostLoginRedirect(searchParams.get('redirect')), { replace: true });
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;

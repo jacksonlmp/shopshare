@@ -19,9 +19,18 @@ export type ListItemDto = {
   sort_order?: number;
 };
 
+/** GET /api/lists/invite/:shareCode/ — público */
+export type ShoppingListInvitePreviewDto = {
+  name: string;
+  description: string;
+  share_code: string;
+  owner_display_name: string;
+};
+
 export type ShoppingListSummaryDto = {
   id: string;
   name: string;
+  description?: string;
   share_code: string;
   owner_id: string;
   is_archived: boolean;
@@ -30,7 +39,7 @@ export type ShoppingListSummaryDto = {
   my_role: string;
 };
 
-export type ShoppingListDetailDto = ShoppingListSummaryDto & {
+export type ShoppingListDetailDto = Omit<ShoppingListSummaryDto, 'my_role'> & {
   members: ListMemberDto[];
   items: ListItemDto[];
 };

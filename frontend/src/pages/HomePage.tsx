@@ -1,5 +1,14 @@
 import axios from 'axios';
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ClipboardEvent,
+  type FormEvent,
+  type KeyboardEvent,
+} from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 
 import { api } from '../api/client';
@@ -27,13 +36,15 @@ export function HomePage() {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const [createOpen, setCreateOpen] = useState(false);
-  const [createName, setCreateName] = useState('Nova lista');
+  const [createName, setCreateName] = useState('');
+  const [createDescription, setCreateDescription] = useState('');
   const [createBusy, setCreateBusy] = useState(false);
 
   const [joinOpen, setJoinOpen] = useState(false);
   const [joinCode, setJoinCode] = useState('');
   const [joinBusy, setJoinBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const joinInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const loadLists = useCallback(async () => {
     setLoadError(null);
@@ -70,6 +81,14 @@ export function HomePage() {
       cancelled = true;
     };
   }, [loadLists]);
+
+  useEffect(() => {
+    if (!joinOpen) return;
+    const id = requestAnimationFrame(() => {
+      joinInputRefs.current[0]?.focus();
+    });
+    return () => cancelAnimationFrame(id);
+  }, [joinOpen]);
 
   const activeLists = useMemo(
     () => summaries.filter((l) => !l.is_archived),
@@ -116,9 +135,15 @@ export function HomePage() {
     setActionError(null);
     setCreateBusy(true);
     try {
-      await api.post('/api/lists/', { name });
+      const payload: { name: string; description?: string } = { name };
+      const desc = createDescription.trim();
+      if (desc) {
+        payload.description = desc;
+      }
+      await api.post('/api/lists/', payload);
       setCreateOpen(false);
-      setCreateName('Nova lista');
+      setCreateName('');
+      setCreateDescription('');
       await loadLists();
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -131,11 +156,70 @@ export function HomePage() {
     }
   }
 
+  const focusJoinSlot = useCallback((index: number) => {
+    joinInputRefs.current[Math.max(0, Math.min(5, index))]?.focus();
+  }, []);
+
+  const handleJoinSlotChange = useCallback(
+    (index: number, raw: string) => {
+      const cleaned = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const char = cleaned.length === 0 ? '' : cleaned.slice(-1);
+      setJoinCode((prev) => {
+        const slots = Array.from({ length: 6 }, (_, j) => prev[j] ?? '');
+        slots[index] = char;
+        const next = slots.join('');
+        if (char && index < 5) {
+          queueMicrotask(() => focusJoinSlot(index + 1));
+        }
+        return next;
+      });
+    },
+    [focusJoinSlot],
+  );
+
+  const handleJoinSlotKeyDown = useCallback(
+    (index: number, e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Backspace' && !e.currentTarget.value && index > 0) {
+        e.preventDefault();
+        setJoinCode((prev) => {
+          const slots = Array.from({ length: 6 }, (_, j) => prev[j] ?? '');
+          slots[index - 1] = '';
+          return slots.join('');
+        });
+        queueMicrotask(() => focusJoinSlot(index - 1));
+        return;
+      }
+      if (e.key === 'ArrowLeft' && index > 0) {
+        e.preventDefault();
+        focusJoinSlot(index - 1);
+      }
+      if (e.key === 'ArrowRight' && index < 5) {
+        e.preventDefault();
+        focusJoinSlot(index + 1);
+      }
+    },
+    [focusJoinSlot],
+  );
+
+  const handleJoinPaste = useCallback(
+    (e: ClipboardEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const text = e.clipboardData
+        .getData('text')
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '')
+        .slice(0, 6);
+      setJoinCode(text);
+      queueMicrotask(() => focusJoinSlot(Math.min(text.length, 5)));
+    },
+    [focusJoinSlot],
+  );
+
   async function handleJoinList(e: FormEvent): Promise<void> {
     e.preventDefault();
     const code = joinCode.trim().toUpperCase();
     if (code.length !== 6) {
-      setActionError('O código tem 6 caracteres.');
+      setActionError('Preencha os 6 caracteres do código.');
       return;
     }
     setActionError(null);
@@ -260,6 +344,8 @@ export function HomePage() {
             type="button"
             onClick={() => {
               setActionError(null);
+              setCreateName('');
+              setCreateDescription('');
               setCreateOpen(true);
             }}
             className="surface-bento-primary group relative cursor-pointer overflow-hidden rounded-[1rem] p-8 text-left transition-transform duration-300 hover:scale-[1.02] md:rounded-[1.25rem]"
@@ -286,6 +372,7 @@ export function HomePage() {
             type="button"
             onClick={() => {
               setActionError(null);
+              setJoinCode('');
               setJoinOpen(true);
             }}
             className="group relative cursor-pointer overflow-hidden rounded-[1rem] bg-surface-container p-8 text-left transition-transform duration-300 hover:scale-[1.02] md:rounded-[1.25rem]"
@@ -488,10 +575,10 @@ export function HomePage() {
         </div>
       </footer>
 
-      {/* Modal: nova lista */}
+      {/* Modal: nova lista — layout Stitch (node c1238f00…) */}
       {createOpen ? (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-on-surface/40 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
           role="presentation"
           onClick={() => !createBusy && setCreateOpen(false)}
         >
@@ -499,56 +586,100 @@ export function HomePage() {
             role="dialog"
             aria-modal
             aria-labelledby="create-list-title"
-            className="w-full max-w-md rounded-[1.25rem] border border-outline-variant/20 bg-surface-container-lowest p-6 shadow-ambient"
+            className="relative w-full max-w-lg overflow-hidden rounded-xl border border-outline-variant/20 bg-surface-container-lowest shadow-2xl shadow-primary/10"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 id="create-list-title" className="font-headline text-xl font-bold text-on-surface">
-              Nova lista
-            </h2>
-            <form className="mt-4 space-y-4" onSubmit={(e) => void handleCreateList(e)}>
-              <div>
-                <label className="mb-1 block text-sm font-semibold text-on-surface-variant" htmlFor="new-list-name">
-                  Nome
-                </label>
-                <input
-                  id="new-list-name"
-                  className="w-full rounded-lg border border-transparent bg-surface-container-low px-4 py-3 font-body text-on-surface shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--color-outline-variant)_18%,transparent)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25"
-                  value={createName}
-                  onChange={(e) => setCreateName(e.target.value)}
-                  autoFocus
-                />
+            <div className="p-8 md:p-10">
+              <button
+                type="button"
+                className="absolute right-4 top-4 rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-container-low md:right-6 md:top-6"
+                onClick={() => !createBusy && setCreateOpen(false)}
+                aria-label="Fechar"
+              >
+                <span className="material-symbols-outlined text-[22px]" aria-hidden>
+                  close
+                </span>
+              </button>
+
+              <div className="mb-8 text-center">
+                <h2 id="create-list-title" className="font-headline text-3xl font-extrabold text-primary">
+                  Criar nova lista
+                </h2>
+                <div className="mx-auto mt-2 h-1.5 w-12 rounded-full bg-primary" aria-hidden />
               </div>
-              {actionError && createOpen ? (
-                <p className="text-sm text-error" role="alert">
-                  {actionError}
-                </p>
-              ) : null}
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  className="rounded-full px-4 py-2 text-sm font-bold text-on-surface-variant hover:bg-surface-container-low"
-                  onClick={() => setCreateOpen(false)}
-                  disabled={createBusy}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="btn-primary-jewel rounded-full px-6 py-2.5 text-sm disabled:opacity-50"
-                  disabled={createBusy}
-                >
-                  {createBusy ? 'A criar…' : 'Criar'}
-                </button>
-              </div>
-            </form>
+
+              <form className="space-y-6" onSubmit={(e) => void handleCreateList(e)}>
+                <div className="space-y-2">
+                  <label className="ml-1 block text-sm font-bold text-on-surface-variant" htmlFor="new-list-name">
+                    Nome da lista
+                  </label>
+                  <input
+                    id="new-list-name"
+                    className="w-full rounded-xl border-2 border-transparent bg-surface-container-low px-5 py-3.5 font-body font-medium text-on-surface outline-none transition-all placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0"
+                    value={createName}
+                    onChange={(e) => setCreateName(e.target.value)}
+                    placeholder="Ex: Compras de casa"
+                    autoFocus
+                    autoComplete="off"
+                  />
+                  <p className="ml-1 text-xs text-on-surface-variant/70">
+                    Dê um nome fácil de identificar para a sua nova lista.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    className="ml-1 block text-sm font-bold text-on-surface-variant"
+                    htmlFor="new-list-description"
+                  >
+                    Descrição (opcional)
+                  </label>
+                  <textarea
+                    id="new-list-description"
+                    rows={3}
+                    className="w-full resize-none rounded-xl border-2 border-transparent bg-surface-container-low px-5 py-3.5 font-body font-medium text-on-surface outline-none transition-all placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0"
+                    value={createDescription}
+                    onChange={(e) => setCreateDescription(e.target.value)}
+                    placeholder="Ex: Compras para o evento de sábado"
+                  />
+                  <p className="ml-1 text-xs text-on-surface-variant/70">
+                    Opcional — visível no convite por link e no detalhe da lista.
+                  </p>
+                </div>
+
+                {actionError && createOpen ? (
+                  <p className="text-sm font-medium text-error" role="alert">
+                    {actionError}
+                  </p>
+                ) : null}
+
+                <div className="mt-4 flex flex-col gap-3">
+                  <button
+                    type="submit"
+                    className="w-full rounded-xl bg-primary py-4 font-headline text-lg font-bold text-on-primary shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/20 active:scale-[0.98] disabled:opacity-50"
+                    disabled={createBusy}
+                  >
+                    {createBusy ? 'A criar…' : 'Criar lista'}
+                  </button>
+                  <button
+                    type="button"
+                    className="w-full rounded-xl py-2 font-semibold text-[#65518a] transition-colors hover:bg-surface-container-low dark:text-[#c4b5dc]"
+                    onClick={() => setCreateOpen(false)}
+                    disabled={createBusy}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       ) : null}
 
-      {/* Modal: entrar com código */}
+      {/* Modal: entrar com código — layout Stitch (node 99426f94…) */}
       {joinOpen ? (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-on-surface/40 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-[color-mix(in_srgb,var(--color-on-surface)_45%,transparent)] p-4 backdrop-blur-sm dark:bg-black/50"
           role="presentation"
           onClick={() => !joinBusy && setJoinOpen(false)}
         >
@@ -556,46 +687,96 @@ export function HomePage() {
             role="dialog"
             aria-modal
             aria-labelledby="join-list-title"
-            className="w-full max-w-md rounded-[1.25rem] border border-outline-variant/20 bg-surface-container-lowest p-6 shadow-ambient"
+            aria-describedby="join-list-desc"
+            className="w-full max-w-md overflow-hidden rounded-xl border border-outline-variant/20 bg-surface-container-lowest shadow-2xl shadow-primary/10"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 id="join-list-title" className="font-headline text-xl font-bold text-on-surface">
-              Entrar na lista
-            </h2>
-            <p className="mt-1 text-sm text-on-surface-variant">Código de 6 letras (ex.: AB12CD)</p>
-            <form className="mt-4 space-y-4" onSubmit={(e) => void handleJoinList(e)}>
-              <input
-                className="w-full rounded-lg border border-transparent bg-surface-container-low px-4 py-3 font-mono text-lg uppercase tracking-widest text-on-surface shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--color-outline-variant)_18%,transparent)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25"
-                value={joinCode}
-                onChange={(e) => setJoinCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
-                placeholder="______"
-                maxLength={6}
-                autoFocus
-                aria-label="Código da lista"
-              />
-              {actionError && joinOpen ? (
-                <p className="text-sm text-error" role="alert">
-                  {actionError}
+            <div className="p-8">
+              <div className="mb-8 text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-container text-primary">
+                  <span
+                    className="material-symbols-outlined text-4xl"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                    aria-hidden
+                  >
+                    group_add
+                  </span>
+                </div>
+                <h2 id="join-list-title" className="font-headline text-2xl font-extrabold tracking-tight text-on-surface">
+                  Entrar em uma lista
+                </h2>
+                <p id="join-list-desc" className="mt-2 text-sm text-on-surface-variant">
+                  Insira o código de 6 caracteres para aceder a uma lista partilhada.
                 </p>
-              ) : null}
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  className="rounded-full px-4 py-2 text-sm font-bold text-on-surface-variant hover:bg-surface-container-low"
-                  onClick={() => setJoinOpen(false)}
-                  disabled={joinBusy}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="btn-primary-jewel rounded-full px-6 py-2.5 text-sm disabled:opacity-50"
-                  disabled={joinBusy}
-                >
-                  {joinBusy ? 'A entrar…' : 'Entrar'}
-                </button>
               </div>
-            </form>
+
+              <form onSubmit={(e) => void handleJoinList(e)}>
+                <div
+                  className="mb-8 flex flex-wrap justify-center gap-2 sm:gap-3"
+                  onPaste={handleJoinPaste}
+                >
+                  {Array.from({ length: 6 }, (_, i) => (
+                    <input
+                      key={i}
+                      ref={(el) => {
+                        joinInputRefs.current[i] = el;
+                      }}
+                      type="text"
+                      inputMode="text"
+                      autoCapitalize="characters"
+                      autoComplete="off"
+                      maxLength={1}
+                      aria-label={`Carácter ${i + 1} do código`}
+                      className="h-14 w-11 rounded-lg border-2 border-transparent bg-surface-container text-center font-headline text-2xl font-bold uppercase text-primary outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary-container sm:w-12"
+                      value={joinCode[i] ?? ''}
+                      placeholder="-"
+                      onChange={(e) => handleJoinSlotChange(i, e.target.value)}
+                      onKeyDown={(e) => handleJoinSlotKeyDown(i, e)}
+                      onFocus={(e) => e.target.select()}
+                      disabled={joinBusy}
+                    />
+                  ))}
+                </div>
+
+                {actionError && joinOpen ? (
+                  <p className="mb-4 text-center text-sm font-medium text-error" role="alert">
+                    {actionError}
+                  </p>
+                ) : null}
+
+                <div className="flex flex-col gap-3">
+                  <button
+                    type="submit"
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 font-headline font-bold text-on-primary shadow-lg shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
+                    disabled={joinBusy}
+                  >
+                    <span>{joinBusy ? 'A entrar…' : 'Entrar'}</span>
+                    {!joinBusy ? (
+                      <span className="material-symbols-outlined text-[22px]" aria-hidden>
+                        arrow_forward
+                      </span>
+                    ) : null}
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-full bg-transparent py-3 font-bold text-on-surface-variant transition-all hover:bg-surface-container-low active:scale-[0.98]"
+                    onClick={() => !joinBusy && setJoinOpen(false)}
+                    disabled={joinBusy}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div className="border-t border-outline-variant/15 bg-surface-container-low px-4 py-4 text-center">
+              <p className="flex items-center justify-center gap-1.5 text-xs text-on-surface-variant">
+                <span className="material-symbols-outlined text-base" aria-hidden>
+                  info
+                </span>
+                O código foi fornecido pelo criador da lista.
+              </p>
+            </div>
           </div>
         </div>
       ) : null}

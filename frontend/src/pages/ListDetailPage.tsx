@@ -77,6 +77,11 @@ export function ListDetailPage() {
               <p className="mt-2 text-on-surface-variant">
                 {detail.items.length} itens · {detail.members.length} pessoas
               </p>
+              {detail.description?.trim() ? (
+                <p className="mt-4 max-w-2xl whitespace-pre-wrap leading-relaxed text-on-surface-variant">
+                  {detail.description.trim()}
+                </p>
+              ) : null}
             </div>
             <ul className="space-y-2 rounded-[1rem] border border-outline-variant/20 bg-surface-container-lowest p-4 shadow-ambient sm:p-6">
               {detail.items.length === 0 ? (

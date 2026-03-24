@@ -5,6 +5,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -14,6 +15,7 @@ from apps.lists.serializers import (
     JoinListSerializer,
     ShoppingListCreateSerializer,
     ShoppingListDetailSerializer,
+    ShoppingListInvitePreviewSerializer,
     ShoppingListPatchSerializer,
     ShoppingListReadSerializer,
     ShoppingListSummarySerializer,
@@ -156,6 +158,31 @@ class ShoppingListJoinView(APIView):
             ShoppingListReadSerializer(shopping_list).data,
             status=status.HTTP_200_OK,
         )
+
+
+class ShoppingListInvitePreviewView(APIView):
+    """Pré-visualização pública para a página de convite (`/invite/:code`)."""
+
+    permission_classes = [AllowAny]
+    authentication_classes: list = []
+
+    @extend_schema(
+        summary="Convite — pré-visualização por código (público)",
+        tags=["lists"],
+        responses={200: ShoppingListInvitePreviewSerializer},
+    )
+    def get(self, request, share_code: str):
+        raw = (share_code or "").strip().upper()
+        if len(raw) != 6 or not raw.isalnum():
+            raise ValidationError(detail="Invalid share code.")
+        try:
+            shopping_list = ShoppingList.objects.select_related("owner").get(
+                share_code=raw,
+                is_archived=False,
+            )
+        except ShoppingList.DoesNotExist:
+            raise NotFound(detail="List not found.") from None
+        return Response(ShoppingListInvitePreviewSerializer(shopping_list).data)
 
 
 class ShoppingListDetailView(APIView):

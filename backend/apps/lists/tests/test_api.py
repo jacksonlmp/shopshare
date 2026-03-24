@@ -37,6 +37,18 @@ class ListsAPITestCase(APITestCase):
             ).exists()
         )
 
+    def test_post_lists_null_description_stored_as_empty(self) -> None:
+        response = self.client.post(
+            "/api/lists/",
+            {"name": "NoDesc", "description": None},
+            format="json",
+            HTTP_X_USER_ID=str(self.owner.id),
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.json()["description"], "")
+        row = ShoppingList.objects.get(pk=response.json()["id"])
+        self.assertEqual(row.description, "")
+
     def test_get_lists_returns_my_role(self) -> None:
         lst = ShoppingList.objects.create(
             name="L", owner=self.owner, share_code="ABCDEF"
@@ -120,3 +132,30 @@ class ListsAPITestCase(APITestCase):
         self.assertEqual(response_ok.status_code, status.HTTP_200_OK)
         lst.refresh_from_db()
         self.assertEqual(lst.name, "New")
+
+    def test_invite_preview_public_no_auth(self) -> None:
+        lst = ShoppingList.objects.create(
+            name="Party",
+            owner=self.owner,
+            share_code="PRVW01",
+            description="Bebidas e snacks.",
+        )
+        ListMember.objects.create(list=lst, user=self.owner, role=ListMember.ROLE_OWNER)
+        response = self.client.get("/api/lists/invite/PRVW01/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.json()
+        self.assertEqual(data["name"], "Party")
+        self.assertEqual(data["description"], "Bebidas e snacks.")
+        self.assertEqual(data["share_code"], "PRVW01")
+        self.assertEqual(data["owner_display_name"], "Owner")
+
+    def test_invite_preview_archived_404(self) -> None:
+        lst = ShoppingList.objects.create(
+            name="Gone",
+            owner=self.owner,
+            share_code="ARC001",
+            is_archived=True,
+        )
+        ListMember.objects.create(list=lst, user=self.owner, role=ListMember.ROLE_OWNER)
+        response = self.client.get("/api/lists/invite/ARC001/")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

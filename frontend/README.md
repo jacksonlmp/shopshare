@@ -42,6 +42,7 @@ The repo root `docker-compose.yml` includes a `frontend` service that runs `npm 
 | `/login` | Entrar — apelido + avatar (`POST /api/users/`) |
 | `/home` | Dashboard — listas (`GET/POST /api/lists/`), entrar por código, cartões bento ([Stitch — painel](https://stitch.withgoogle.com/projects/515881793632764729?node-id=a7fde7328edf41d99cef56bf0f05ffa6)) |
 | `/lists/:listId` | Detalhe da lista (itens + código) |
+| `/invite/:shareCode` | Convite por link — modal «Convite via link» (6 caracteres); sessão → join; sem sessão → login com `redirect` |
 
 ## Structure
 

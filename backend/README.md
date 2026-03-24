@@ -2,6 +2,18 @@
 
 This folder contains the Django backend running through Docker Compose.
 
+## Dados de demo (convite por link)
+
+Com o stack Docker a correr e migrações aplicadas:
+
+```bash
+make seed-invite-demo
+```
+
+Isto cria o utilizador **Demo Seed** e uma lista **Churrasco de domingo (demo)** com código **`INVITE`**. No frontend (Vite, porta 5173):
+
+`http://localhost:5173/invite/INVITE`
+
 ## Quick start
 
 1. Install dependencies:
@@ -38,6 +50,7 @@ make backend-logs
   - `POST /api/lists/` — criar lista (body: `name`, opcional `is_archived`; dono = `X-User-Id`)
   - `GET /api/lists/{id}/` — detalhe com `members` e `items` (só membros)
   - `POST /api/lists/join/` — entrar por código (body: `share_code`)
+  - `GET /api/lists/invite/<share_code>/` — pré-visualização pública do convite (nome, `description`, dono); sem `X-User-Id`
   - `PATCH /api/lists/{id}/` — renomear / arquivar (só o dono)
 - **Items** (membro da lista; header `X-User-Id`):
   - `POST /api/lists/{list_id}/items/` — adicionar item
