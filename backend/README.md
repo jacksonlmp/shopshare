@@ -48,11 +48,12 @@ make backend-logs
 - **Lists** (sempre enviar header `X-User-Id` com o UUID do usuário):
   - `GET /api/lists/` — listas em que o usuário é membro (`my_role`: `owner` | `member`)
   - `POST /api/lists/` — criar lista (body: `name`, opcional `is_archived`; dono = `X-User-Id`)
-  - `GET /api/lists/{id}/` — detalhe com `members` e `items` (só membros)
+  - `GET /api/lists/{id}/` — detalhe com `members` e `items` (só membros); resposta inclui `banner_color_hex` e `banner_image_url` (opcionais)
   - `POST /api/lists/join/` — entrar por código (body: `share_code`)
-  - `GET /api/lists/invite/<share_code>/` — pré-visualização pública do convite (nome, `description`, dono); sem `X-User-Id`
-  - `PATCH /api/lists/{id}/` — renomear / arquivar (só o dono)
+  - `GET /api/lists/invite/<share_code>/` — pré-visualização pública do convite (nome, `description`, dono, opcional `banner_color_hex`, `banner_image_url`); sem `X-User-Id`
+  - `PATCH /api/lists/{id}/` — renomear / arquivar / banner (só o dono): body pode incluir `name`, `is_archived`, `banner_color_hex` (`#RRGGBB` ou vazio), `banner_image_url` (URL http(s) ou vazio)
 - **Items** (membro da lista; header `X-User-Id`):
+  - `GET /api/categories/` — categorias globais (`id`, `name`, `emoji`); sem `X-User-Id`
   - `POST /api/lists/{list_id}/items/` — adicionar item
   - `PATCH /api/items/{item_id}/check/` — marcar/desmarcar
   - `PATCH /api/items/{item_id}/` — editar

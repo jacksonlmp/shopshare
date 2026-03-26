@@ -3,6 +3,7 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from apps.items.models import Category, Item
 from apps.lists.models import ListMember, ShoppingList
 from apps.users.models import User
 
@@ -72,6 +73,30 @@ class ListsAPITestCase(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_get_list_detail_items_include_nested_category(self) -> None:
+        lst = ShoppingList.objects.create(
+            name="Groceries", owner=self.owner, share_code="GROC01"
+        )
+        ListMember.objects.create(list=lst, user=self.owner, role=ListMember.ROLE_OWNER)
+        cat = Category.objects.create(name="Laticínios", emoji="🥛", color_hex="#4DA3FF")
+        Item.objects.create(
+            list=lst,
+            added_by=self.owner,
+            category=cat,
+            name="Leite",
+            quantity=1.0,
+        )
+        response = self.client.get(
+            f"/api/lists/{lst.id}/",
+            HTTP_X_USER_ID=str(self.owner.id),
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        items = response.json()["items"]
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]["category"]["id"], cat.id)
+        self.assertEqual(items[0]["category"]["name"], "Laticínios")
+        self.assertEqual(items[0]["category"]["emoji"], "🥛")
+
     def test_join_list(self) -> None:
         lst = ShoppingList.objects.create(
             name="JoinMe", owner=self.owner, share_code="JOIN01"
@@ -133,12 +158,62 @@ class ListsAPITestCase(APITestCase):
         lst.refresh_from_db()
         self.assertEqual(lst.name, "New")
 
+    def test_patch_list_banner_fields_owner(self) -> None:
+        lst = ShoppingList.objects.create(
+            name="B", owner=self.owner, share_code="BANR01"
+        )
+        ListMember.objects.create(list=lst, user=self.owner, role=ListMember.ROLE_OWNER)
+        response = self.client.patch(
+            f"/api/lists/{lst.id}/",
+            {
+                "banner_color_hex": "#a1b2c3",
+                "banner_image_url": "https://example.com/banner.jpg",
+            },
+            format="json",
+            HTTP_X_USER_ID=str(self.owner.id),
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.json()
+        self.assertEqual(data["banner_color_hex"], "#A1B2C3")
+        self.assertEqual(data["banner_image_url"], "https://example.com/banner.jpg")
+        lst.refresh_from_db()
+        self.assertEqual(lst.banner_color_hex, "#A1B2C3")
+        self.assertEqual(lst.banner_image_url, "https://example.com/banner.jpg")
+
+    def test_patch_list_banner_invalid_color(self) -> None:
+        lst = ShoppingList.objects.create(
+            name="B", owner=self.owner, share_code="BANR02"
+        )
+        ListMember.objects.create(list=lst, user=self.owner, role=ListMember.ROLE_OWNER)
+        response = self.client.patch(
+            f"/api/lists/{lst.id}/",
+            {"banner_color_hex": "red"},
+            format="json",
+            HTTP_X_USER_ID=str(self.owner.id),
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_patch_list_banner_invalid_url(self) -> None:
+        lst = ShoppingList.objects.create(
+            name="B", owner=self.owner, share_code="BANR03"
+        )
+        ListMember.objects.create(list=lst, user=self.owner, role=ListMember.ROLE_OWNER)
+        response = self.client.patch(
+            f"/api/lists/{lst.id}/",
+            {"banner_image_url": "not-a-url"},
+            format="json",
+            HTTP_X_USER_ID=str(self.owner.id),
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_invite_preview_public_no_auth(self) -> None:
         lst = ShoppingList.objects.create(
             name="Party",
             owner=self.owner,
             share_code="PRVW01",
             description="Bebidas e snacks.",
+            banner_color_hex="#FF00AA",
+            banner_image_url="https://example.com/party.png",
         )
         ListMember.objects.create(list=lst, user=self.owner, role=ListMember.ROLE_OWNER)
         response = self.client.get("/api/lists/invite/PRVW01/")
@@ -148,6 +223,8 @@ class ListsAPITestCase(APITestCase):
         self.assertEqual(data["description"], "Bebidas e snacks.")
         self.assertEqual(data["share_code"], "PRVW01")
         self.assertEqual(data["owner_display_name"], "Owner")
+        self.assertEqual(data["banner_color_hex"], "#FF00AA")
+        self.assertEqual(data["banner_image_url"], "https://example.com/party.png")
 
     def test_invite_preview_archived_404(self) -> None:
         lst = ShoppingList.objects.create(

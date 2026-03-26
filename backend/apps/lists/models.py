@@ -23,6 +23,18 @@ class ShoppingList(models.Model):
         default="",
         db_default=Value(""),
     )
+    banner_color_hex = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        db_default=Value(""),
+    )
+    banner_image_url = models.CharField(
+        max_length=512,
+        blank=True,
+        default="",
+        db_default=Value(""),
+    )
     share_code = models.CharField(max_length=6, unique=True)
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="owned_lists"
@@ -42,6 +54,10 @@ class ShoppingList(models.Model):
         # API/clients may send null; DB column is NOT NULL — store empty string.
         if self.description is None:
             self.description = ""
+        if self.banner_color_hex is None:
+            self.banner_color_hex = ""
+        if self.banner_image_url is None:
+            self.banner_image_url = ""
         # Auto-generate a unique code if not provided.
         if not self.share_code:
             for _ in range(10):

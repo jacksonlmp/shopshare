@@ -3,7 +3,7 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from apps.items.models import Item, ItemHistory
+from apps.items.models import Category, Item, ItemHistory
 from apps.lists.models import ListMember, ShoppingList
 from apps.users.models import User
 
@@ -137,6 +137,35 @@ class ItemsAPITestCase(APITestCase):
             HTTP_X_USER_ID=str(other_member.id),
         )
         self.assertEqual(response_forbidden.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_categories_public(self) -> None:
+        response = self.client.get("/api/categories/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        rows = response.json()
+        self.assertGreaterEqual(len(rows), 1)
+        self.assertIn("id", rows[0])
+        self.assertIn("name", rows[0])
+        self.assertIn("emoji", rows[0])
+        dairy = Category.objects.filter(name="Laticínios").first()
+        if dairy:
+            self.assertTrue(any(r["id"] == dairy.id for r in rows))
+
+    def test_get_categories_includes_six_pt_defaults(self) -> None:
+        response = self.client.get("/api/categories/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        names = {row["name"] for row in response.json()}
+        expected = {
+            "Frutas",
+            "Laticínios",
+            "Carnes",
+            "Limpeza",
+            "Bebidas",
+            "Padaria",
+        }
+        self.assertTrue(
+            expected.issubset(names),
+            msg=f"Faltam categorias PT: {expected - names}",
+        )
 
     def test_suggestions_top_by_times_added(self) -> None:
         ItemHistory.objects.create(

@@ -12,7 +12,9 @@
   --color-background: #fcf4ff;
   --color-surface: #fcf4ff;
   --color-on-surface: #37274d;
+  --color-on-background: #37274d;
   --color-on-surface-variant: #66547d;
+  --color-outline: #826f9a;
   --color-primary: #652fe7;
   --color-primary-dim: #5819db;
   --color-on-primary: #f7f0ff;
@@ -113,7 +115,9 @@ html[data-theme='dark'] {
   --color-background: #120e18;
   --color-surface: #120e18;
   --color-on-surface: #ebe3f7;
+  --color-on-background: #ebe3f7;
   --color-on-surface-variant: #a89bb8;
+  --color-outline: #a994c2;
   --color-primary: #8b6cff;
   --color-primary-dim: #6b46f0;
   --color-on-primary: #f7f0ff;

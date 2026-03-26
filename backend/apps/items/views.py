@@ -4,11 +4,13 @@ from django.db import transaction
 from django.db.models import F
 from rest_framework import status
 from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.items.models import Item, ItemHistory
+from apps.items.models import Category, Item, ItemHistory
 from apps.items.serializers import (
+    CategorySuggestionSerializer,
     ItemCheckSerializer,
     ItemCreateSerializer,
     ItemReadSerializer,
@@ -160,6 +162,17 @@ class ItemDetailView(APIView):
             exclude_user_id=user_id,
         )
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CategoryListView(APIView):
+    """Lista global de categorias (emoji + nome) para o modal de novo item."""
+
+    permission_classes = [AllowAny]
+    authentication_classes: list = []
+
+    def get(self, request):
+        qs = Category.objects.order_by("name")
+        return Response(CategorySuggestionSerializer(qs, many=True).data)
 
 
 class ItemSuggestionsView(APIView):

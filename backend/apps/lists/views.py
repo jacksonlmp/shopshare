@@ -208,7 +208,9 @@ class ShoppingListDetailView(APIView):
                 ),
                 Prefetch(
                     "items",
-                    queryset=Item.objects.order_by("sort_order", "created_at"),
+                    queryset=Item.objects.select_related("category").order_by(
+                        "sort_order", "created_at"
+                    ),
                 ),
             )
             .first()

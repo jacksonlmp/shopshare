@@ -6,6 +6,7 @@ import { api } from '../api/client';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { useSessionStore } from '../store/useSessionStore';
 import type { ShoppingListInvitePreviewDto, ShoppingListSummaryDto } from '../types/lists';
+import { isValidBannerHex } from '../utils/banner';
 
 const BANNER_IMG = '/images/hero-frutas.png';
 
@@ -117,6 +118,13 @@ export function InvitePage() {
         ? preview.name
         : 'Lista partilhada';
 
+  const inviteBannerHex = preview?.banner_color_hex?.trim() ?? '';
+  const inviteImg = preview?.banner_image_url?.trim() ?? '';
+  const inviteHasImg = Boolean(inviteImg);
+  const inviteHasHex = Boolean(preview && isValidBannerHex(inviteBannerHex));
+  const inviteHexUpper = inviteHasHex ? inviteBannerHex.toUpperCase() : '';
+  const inviteHeroLoading = previewLoading && !preview;
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-surface font-body text-on-surface antialiased">
       {/* Fundo estilo painel desfocado (referência Stitch) */}
@@ -153,11 +161,42 @@ export function InvitePage() {
           className="max-h-[min(92vh,720px)] w-full max-w-md overflow-y-auto overflow-x-hidden rounded-xl border border-outline-variant/20 bg-surface-container-lowest shadow-2xl shadow-primary/15"
         >
           <div className="relative h-48 w-full shrink-0">
-            <img
-              src={BANNER_IMG}
-              alt="Ilustração de mercearia"
-              className="h-full w-full object-cover"
-            />
+            {inviteHeroLoading ? (
+              <img
+                src={BANNER_IMG}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : inviteHasImg ? (
+              <img
+                src={inviteImg}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : inviteHasHex ? (
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(145deg, ${inviteHexUpper}, color-mix(in srgb, ${inviteHexUpper} 48%, black))`,
+                }}
+                aria-hidden
+              />
+            ) : (
+              <img
+                src={BANNER_IMG}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            )}
+            {inviteHasHex && inviteHasImg ? (
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(135deg, color-mix(in srgb, ${inviteHexUpper} 52%, transparent), color-mix(in srgb, ${inviteHexUpper} 22%, black))`,
+                }}
+                aria-hidden
+              />
+            ) : null}
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent" />
             <div className="absolute bottom-0 left-0 flex w-full items-end gap-3 p-6">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-white bg-surface-container-lowest/90 text-2xl shadow-lg">

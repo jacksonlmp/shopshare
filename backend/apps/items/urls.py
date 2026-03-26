@@ -8,6 +8,7 @@ from apps.items.views import (
 )
 
 urlpatterns = [
+    # GET /api/categories/ — registado em config.urls (CategoryListView)
     # Phase 3 — Items
     path("lists/<str:list_id>/items/", ItemAddView.as_view(), name="item-add"),
     path("items/<str:item_id>/check/", ItemCheckView.as_view(), name="item-check"),

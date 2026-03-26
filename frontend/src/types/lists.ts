@@ -8,15 +8,24 @@ export type ListMemberDto = {
   joined_at: number;
 };
 
+export type ListItemCategoryDto = {
+  id: number;
+  name: string;
+  emoji: string;
+};
+
 export type ListItemDto = {
   id: string;
   list_id: string;
   name: string;
   is_checked: boolean;
-  quantity?: string;
-  unit?: string;
-  category?: string;
+  quantity?: number;
+  unit?: string | null;
+  note?: string | null;
+  category?: ListItemCategoryDto | null;
   sort_order?: number;
+  added_by?: string;
+  checked_by?: string | null;
 };
 
 /** GET /api/lists/invite/:shareCode/ — público */
@@ -25,12 +34,16 @@ export type ShoppingListInvitePreviewDto = {
   description: string;
   share_code: string;
   owner_display_name: string;
+  banner_color_hex?: string;
+  banner_image_url?: string;
 };
 
 export type ShoppingListSummaryDto = {
   id: string;
   name: string;
   description?: string;
+  banner_color_hex?: string;
+  banner_image_url?: string;
   share_code: string;
   owner_id: string;
   is_archived: boolean;

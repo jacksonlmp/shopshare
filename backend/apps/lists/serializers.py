@@ -1,10 +1,53 @@
 from __future__ import annotations
 
+import re
+
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.validators import URLValidator
 from django.db import transaction
 from rest_framework import serializers
 
-from apps.items.models import Item
+from apps.items.models import Category, Item
 from apps.lists.models import ListMember, ShoppingList
+
+_BANNER_HEX_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
+_BANNER_URL_VALIDATOR = URLValidator(schemes=("http", "https"))
+
+
+def normalize_banner_color_hex(value: str | None) -> str:
+    if value is None:
+        return ""
+    s = value.strip()
+    if not s:
+        return ""
+    if not _BANNER_HEX_RE.match(s):
+        raise serializers.ValidationError(
+            "Cor inválida. Use o formato #RRGGBB (ex.: #652FE7)."
+        )
+    return s.upper()
+
+
+def normalize_banner_image_url(value: str | None) -> str:
+    if value is None:
+        return ""
+    s = value.strip()
+    if not s:
+        return ""
+    try:
+        _BANNER_URL_VALIDATOR(s)
+    except DjangoValidationError as exc:
+        raise serializers.ValidationError(
+            "URL da imagem inválida. Use um endereço http ou https."
+        ) from exc
+    return s
+
+
+class ItemCategoryReadSerializer(serializers.ModelSerializer):
+    """Categoria aninhada no detalhe da lista (emoji + nome para UI)."""
+
+    class Meta:
+        model = Category
+        fields = ["id", "name", "emoji"]
 
 
 class ShoppingListCreateSerializer(serializers.ModelSerializer):
@@ -15,6 +58,18 @@ class ShoppingListCreateSerializer(serializers.ModelSerializer):
         allow_blank=True,
         allow_null=True,
     )
+    banner_color_hex = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=7,
+    )
+    banner_image_url = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=512,
+    )
 
     class Meta:
         model = ShoppingList
@@ -22,6 +77,8 @@ class ShoppingListCreateSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "description",
+            "banner_color_hex",
+            "banner_image_url",
             "share_code",
             "owner_id",
             "is_archived",
@@ -32,6 +89,12 @@ class ShoppingListCreateSerializer(serializers.ModelSerializer):
 
     def validate_description(self, value: str | None) -> str:
         return "" if value is None else value
+
+    def validate_banner_color_hex(self, value: str | None) -> str:
+        return normalize_banner_color_hex(value)
+
+    def validate_banner_image_url(self, value: str | None) -> str:
+        return normalize_banner_image_url(value)
 
     def create(self, validated_data: dict) -> ShoppingList:
         owner_id = self.context["owner_id"]
@@ -56,6 +119,8 @@ class ShoppingListReadSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "description",
+            "banner_color_hex",
+            "banner_image_url",
             "share_code",
             "owner_id",
             "is_archived",
@@ -71,7 +136,14 @@ class ShoppingListInvitePreviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ShoppingList
-        fields = ["name", "description", "share_code", "owner_display_name"]
+        fields = [
+            "name",
+            "description",
+            "banner_color_hex",
+            "banner_image_url",
+            "share_code",
+            "owner_display_name",
+        ]
 
 
 class ShoppingListSummarySerializer(serializers.ModelSerializer):
@@ -86,6 +158,8 @@ class ShoppingListSummarySerializer(serializers.ModelSerializer):
             "id",
             "name",
             "description",
+            "banner_color_hex",
+            "banner_image_url",
             "share_code",
             "owner_id",
             "is_archived",
@@ -117,6 +191,7 @@ class ItemReadSerializer(serializers.ModelSerializer):
         read_only=True,
         allow_null=True,
     )
+    category = ItemCategoryReadSerializer(read_only=True, allow_null=True)
 
     class Meta:
         model = Item
@@ -148,6 +223,8 @@ class ShoppingListDetailSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "description",
+            "banner_color_hex",
+            "banner_image_url",
             "share_code",
             "owner_id",
             "is_archived",
@@ -164,13 +241,37 @@ class ShoppingListPatchSerializer(serializers.ModelSerializer):
         allow_blank=True,
         allow_null=True,
     )
+    banner_color_hex = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=7,
+    )
+    banner_image_url = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=512,
+    )
 
     class Meta:
         model = ShoppingList
-        fields = ["name", "description", "is_archived"]
+        fields = [
+            "name",
+            "description",
+            "banner_color_hex",
+            "banner_image_url",
+            "is_archived",
+        ]
 
     def validate_description(self, value: str | None) -> str:
         return "" if value is None else value
+
+    def validate_banner_color_hex(self, value: str | None) -> str:
+        return normalize_banner_color_hex(value)
+
+    def validate_banner_image_url(self, value: str | None) -> str:
+        return normalize_banner_image_url(value)
 
 
 class JoinListSerializer(serializers.Serializer):
