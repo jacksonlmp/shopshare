@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, NavLink, useParams } from 'react-router-dom';
 
 import { api } from '../api/client';
 import { ThemeToggle } from '../components/ThemeToggle';
@@ -117,9 +117,16 @@ function memberStyle(i: number) {
   return AVATAR_RING[i % AVATAR_RING.length]!;
 }
 
+function sidebarNavClass(active: boolean): string {
+  return `w-full rounded-full px-4 py-3 text-left font-headline text-sm font-bold tracking-tight transition-colors sm:text-base ${
+    active
+      ? 'bg-surface-container-highest text-primary'
+      : 'text-on-surface-variant hover:bg-surface-container-lowest hover:text-primary'
+  }`;
+}
+
 export function ListDetailPage() {
   const { listId } = useParams<{ listId: string }>();
-  const navigate = useNavigate();
   const [detail, setDetail] = useState<ShoppingListDetailDto | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -152,6 +159,8 @@ export function ListDetailPage() {
     bannerPickerUserChangedRef.current = true;
     setEditBannerColor(el.value.toUpperCase());
   }, []);
+
+  const storedUser = useMemo(() => getStoredUser(), []);
 
   const loadDetail = useCallback(async () => {
     if (!listId) return;
@@ -488,30 +497,84 @@ export function ListDetailPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background font-body text-on-surface antialiased">
-      <header className="glass-nav fixed top-0 z-50 w-full border-b border-outline-variant/15">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4 sm:h-[4.25rem] sm:px-8">
-          <div className="flex min-w-0 items-center gap-4">
+    <div className="flex min-h-screen bg-background font-body text-on-surface antialiased">
+      <aside
+        className="glass-nav sticky top-0 z-50 h-dvh w-[280px] shrink-0 border-r border-outline-variant/15"
+        aria-label="Navegação"
+      >
+        <div className="flex h-full flex-col px-5 py-6">
+          <Link
+            to="/home"
+            className="font-headline text-2xl font-black tracking-tight text-primary"
+          >
+            ShopShare
+          </Link>
+
+          <nav className="mt-10 flex flex-col gap-1.5" aria-label="Principal">
+            <NavLink to="/home" end className={({ isActive }) => sidebarNavClass(isActive)}>
+              Painel
+            </NavLink>
+            <NavLink
+              to="/collections"
+              className={({ isActive }) => sidebarNavClass(isActive)}
+            >
+              Coleções
+            </NavLink>
+            <span
+              className="cursor-not-allowed rounded-full px-4 py-3 font-headline text-sm font-bold tracking-tight text-on-surface-variant/50 sm:text-base"
+              title="Em breve"
+            >
+              Mercado
+            </span>
+            <span
+              className="cursor-not-allowed rounded-full px-4 py-3 font-headline text-sm font-bold tracking-tight text-on-surface-variant/50 sm:text-base"
+              title="Em breve"
+            >
+              Perfil
+            </span>
+          </nav>
+
+          <div className="mt-auto flex items-center gap-2 pt-6">
             <button
               type="button"
-              onClick={() => navigate(-1)}
-              className="shrink-0 font-headline text-sm font-bold text-primary hover:underline"
+              className="rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-container-lowest"
+              aria-label="Notificações"
+              title="Em breve"
             >
-              ← Voltar
+              <span className="material-symbols-outlined" aria-hidden>
+                notifications
+              </span>
             </button>
-            <Link
-              to="/home"
-              className="hidden truncate font-headline text-lg font-extrabold tracking-tight text-primary sm:block"
+            <button
+              type="button"
+              className="rounded-full p-2 text-on-surface-variant transition-colors hover:bg-surface-container-lowest"
+              aria-label="Definições"
+              title="Em breve"
             >
-              ShopShare
-            </Link>
+              <span className="material-symbols-outlined" aria-hidden>
+                settings
+              </span>
+            </button>
           </div>
-          <ThemeToggle />
-        </div>
-      </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-24 sm:px-6 sm:pb-12 sm:pt-28">
-        {loading ? (
+          <div className="mt-4 flex items-center gap-3">
+            <div
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-container-high text-xl ring-2 ring-primary-container sm:h-10 sm:w-10"
+              title={storedUser?.displayName}
+            >
+              <span aria-hidden>{storedUser?.avatarEmoji ?? '👤'}</span>
+              <span className="sr-only">{storedUser?.displayName}</span>
+            </div>
+            <div className="ml-auto">
+              <ThemeToggle />
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main className="flex-1 min-w-0 px-4 pb-28 pt-8 sm:px-6 sm:pb-12 sm:pt-6">
+        <div className="mx-auto w-full max-w-3xl">
+          {loading ? (
           <p className="text-on-surface-variant">A carregar…</p>
         ) : error ? (
           <div className="space-y-4">
@@ -783,6 +846,7 @@ export function ListDetailPage() {
             </div>
           </>
         ) : null}
+        </div>
       </main>
 
       {addOpen && detail ? (
@@ -1235,7 +1299,7 @@ export function ListDetailPage() {
                     E-mail
                   </button>
                 </div>
-                {navigator.share ? (
+                {typeof navigator.share === 'function' ? (
                   <button
                     type="button"
                     onClick={() => void handleShareViaSystem()}

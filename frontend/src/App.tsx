@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import { ThemeSync } from './components/ThemeSync';
+import { CollectionsPage } from './pages/CollectionsPage';
 import { HomePage } from './pages/HomePage';
 import { InvitePage } from './pages/InvitePage';
 import { LandingPage } from './pages/LandingPage';
@@ -49,6 +50,20 @@ function ListGate() {
   return <ListDetailPage />;
 }
 
+function CollectionsGate() {
+  const user = useSessionStore((s) => s.user);
+  const location = useLocation();
+  if (!user) {
+    return (
+      <Navigate
+        to={`/login?redirect=${encodeURIComponent(`${location.pathname}${location.search}`)}`}
+        replace
+      />
+    );
+  }
+  return <CollectionsPage />;
+}
+
 function BootstrappingScreen() {
   return (
     <div className="app-loading">
@@ -82,6 +97,7 @@ export default function App() {
         <Route path="/invite/:shareCode" element={<InvitePage />} />
         <Route path="/onboarding" element={<Navigate to="/login" replace />} />
         <Route path="/home" element={<HomeGate />} />
+        <Route path="/collections" element={<CollectionsGate />} />
         <Route path="/lists/:listId" element={<ListGate />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

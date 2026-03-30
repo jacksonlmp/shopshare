@@ -18,10 +18,10 @@ import { useSessionStore } from '../store/useSessionStore';
 import type { ShoppingListDetailDto, ShoppingListSummaryDto } from '../types/lists';
 
 function navClass(active: boolean): string {
-  return `font-headline text-sm font-bold tracking-tight transition-colors sm:text-base ${
+  return `group w-full rounded-full px-4 py-3 text-left font-headline text-sm font-bold tracking-tight transition-colors sm:text-base ${
     active
-      ? 'border-b-2 border-primary pb-1 text-primary'
-      : 'text-on-surface-variant hover:text-primary'
+      ? 'bg-surface-container-highest text-primary'
+      : 'text-on-surface-variant hover:bg-surface-container-lowest hover:text-primary'
   }`;
 }
 
@@ -248,49 +248,44 @@ export function HomePage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface font-body text-on-surface antialiased">
-      <header className="glass-nav fixed top-0 z-50 w-full">
-        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-4 sm:h-20 sm:px-8">
-          <div className="min-w-0 flex-1">
-            <Link
-              to="/"
-              className="font-headline text-lg font-extrabold tracking-tight text-primary sm:text-xl"
-            >
-              ShopShare
-            </Link>
-          </div>
-
-          <nav
-            className="hidden flex-1 items-center justify-center gap-6 md:flex lg:gap-8"
-            aria-label="Principal"
+    <div className="flex min-h-screen bg-surface font-body text-on-surface antialiased">
+      <aside
+        className="glass-nav sticky top-0 z-50 h-dvh w-[280px] shrink-0 border-r border-outline-variant/10"
+        aria-label="Navegação"
+      >
+        <div className="flex h-full flex-col px-5 py-6">
+          <Link
+            to="/"
+            className="font-headline text-2xl font-black tracking-tight text-primary"
           >
+            ShopShare
+          </Link>
+
+          <nav className="mt-10 flex flex-col gap-1.5" aria-label="Principal">
             <NavLink to="/home" end className={({ isActive }) => navClass(isActive)}>
               Painel
             </NavLink>
-            <span
-              className="cursor-not-allowed font-headline text-sm font-bold tracking-tight text-on-surface-variant/50 sm:text-base"
-              title="Em breve"
-            >
+            <NavLink to="/collections" className={({ isActive }) => navClass(isActive)}>
               Coleções
-            </span>
+            </NavLink>
             <span
-              className="cursor-not-allowed font-headline text-sm font-bold tracking-tight text-on-surface-variant/50 sm:text-base"
+              className="cursor-not-allowed rounded-full px-4 py-3 font-headline text-sm font-bold tracking-tight text-on-surface-variant/50 sm:text-base"
               title="Em breve"
             >
               Mercado
             </span>
             <span
-              className="cursor-not-allowed font-headline text-sm font-bold tracking-tight text-on-surface-variant/50 sm:text-base"
+              className="cursor-not-allowed rounded-full px-4 py-3 font-headline text-sm font-bold tracking-tight text-on-surface-variant/50 sm:text-base"
               title="Em breve"
             >
               Perfil
             </span>
           </nav>
 
-          <div className="flex flex-1 items-center justify-end gap-2 sm:gap-4">
+          <div className="mt-auto flex items-center gap-2 pt-6">
             <button
               type="button"
-              className="rounded-full p-2 transition-colors hover:bg-surface-container-low/80"
+              className="rounded-full p-2 transition-colors hover:bg-surface-container-lowest"
               aria-label="Notificações"
               title="Em breve"
             >
@@ -300,7 +295,7 @@ export function HomePage() {
             </button>
             <button
               type="button"
-              className="rounded-full p-2 transition-colors hover:bg-surface-container-low/80"
+              className="rounded-full p-2 transition-colors hover:bg-surface-container-lowest"
               aria-label="Definições"
               title="Em breve"
             >
@@ -308,30 +303,48 @@ export function HomePage() {
                 settings
               </span>
             </button>
+          </div>
+
+          <div className="mt-4 flex items-center gap-3">
             <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-xl ring-2 ring-primary-container sm:h-10 sm:w-10"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-container-high text-xl ring-2 ring-primary-container sm:h-10 sm:w-10"
               title={user?.displayName}
             >
               <span aria-hidden>{user?.avatarEmoji ?? '👤'}</span>
               <span className="sr-only">{user?.displayName}</span>
             </div>
-            <ThemeToggle className="hidden sm:inline-flex" />
+            <div className="ml-auto">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
-        <div className="flex justify-end border-t border-outline-variant/10 px-4 py-2 md:hidden">
-          <ThemeToggle />
-        </div>
-      </header>
+      </aside>
 
-      <main className="mx-auto mt-[4.5rem] w-full max-w-[1200px] flex-1 px-4 pb-16 pt-8 sm:mt-28 sm:px-8 md:mb-20 md:pt-6">
-        <section className="mb-10 md:mb-12">
+      <div className="fixed left-[280px] right-0 top-0 z-40 border-b border-outline-variant/10 bg-surface/80 backdrop-blur">
+        <div className="mx-auto w-full max-w-[1200px] px-4 py-6 sm:px-8">
+          <nav className="mb-2 flex items-center gap-2 text-sm text-on-surface-variant">
+            <span>ShopShare</span>
+            <span className="material-symbols-outlined text-xs" aria-hidden>
+              chevron_right
+            </span>
+            <span className="font-medium text-primary">Painel</span>
+          </nav>
           <h1 className="font-headline mb-2 text-3xl font-black tracking-tight text-on-surface md:text-4xl lg:text-5xl">
             Minha compra coletiva
           </h1>
           <p className="max-w-xl text-on-surface-variant">
             Gerencie suas listas de compras colaborativas e despesas compartilhadas.
           </p>
-        </section>
+        </div>
+      </div>
+
+      <div className="flex min-h-screen flex-1 flex-col">
+      <main className="flex-1 min-w-0 px-4 pb-16 pt-[120px] sm:px-8 md:mb-20">
+        <div className="mx-auto w-full max-w-[1200px]">
+          {/*
+           * Cabeçalho fixo fica no topo (breadcrumb + título + subtítulo).
+           * Este bloco era o cabeçalho anterior e foi removido para evitar duplicação.
+           */}
 
         {loadError ? (
           <p className="mb-6 rounded-lg bg-[color-mix(in_srgb,var(--color-error-container)_12%,transparent)] px-4 py-3 text-sm font-medium text-error" role="alert">
@@ -537,9 +550,10 @@ export function HomePage() {
             Site público
           </Link>
         </div>
-      </main>
+        </div>
+        </main>
 
-      <footer className="mt-auto w-full bg-surface-container py-10 md:py-12">
+        <footer className="mt-auto w-full bg-surface-container py-10 md:py-12">
         <div className="mx-auto flex max-w-[1200px] flex-col items-center justify-between gap-6 px-4 sm:px-8 md:flex-row">
           <div className="flex flex-col items-center md:items-start">
             <span className="font-headline text-lg font-bold text-on-surface">ShopShare</span>
@@ -573,7 +587,9 @@ export function HomePage() {
             </a>
           </nav>
         </div>
-      </footer>
+        </footer>
+
+      </div>
 
       {/* Modal: nova lista — layout Stitch (node c1238f00…) */}
       {createOpen ? (
