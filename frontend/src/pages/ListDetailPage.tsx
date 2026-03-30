@@ -137,6 +137,8 @@ export function ListDetailPage() {
   const [itemError, setItemError] = useState<string | null>(null);
   const [copyHint, setCopyHint] = useState<string | null>(null);
   const [checkingId, setCheckingId] = useState<string | null>(null);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareHint, setShareHint] = useState<string | null>(null);
   const [bannerEditOpen, setBannerEditOpen] = useState(false);
   const [editBannerColor, setEditBannerColor] = useState('');
   const [editBannerImageUrl, setEditBannerImageUrl] = useState('');
@@ -303,27 +305,52 @@ export function ListDetailPage() {
 
   async function handleShare() {
     if (!detail) return;
+    setShareHint(null);
+    setShareModalOpen(true);
+  }
+
+  async function handleCopyInviteLink() {
+    if (!inviteUrl) return;
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      setShareHint('Link copiado');
+      setTimeout(() => setShareHint(null), 2000);
+    } catch {
+      setShareHint('Não foi possível copiar o link');
+      setTimeout(() => setShareHint(null), 2000);
+    }
+  }
+
+  async function handleShareViaSystem() {
+    if (!detail || !inviteUrl || !navigator.share) return;
     const title = detail.name;
     const text = `Entra na lista «${detail.name}» no ShopShare`;
     try {
-      if (navigator.share) {
-        await navigator.share({ title, text, url: inviteUrl });
-      } else {
-        await navigator.clipboard.writeText(inviteUrl);
-        setCopyHint('Link copiado');
-        setTimeout(() => setCopyHint(null), 2000);
-      }
+      await navigator.share({ title, text, url: inviteUrl });
+      setShareHint('Partilha enviada');
+      setTimeout(() => setShareHint(null), 2000);
     } catch (e) {
       if ((e as Error).name === 'AbortError') return;
-      try {
-        await navigator.clipboard.writeText(inviteUrl);
-        setCopyHint('Link copiado');
-        setTimeout(() => setCopyHint(null), 2000);
-      } catch {
-        setCopyHint('Não foi possível partilhar');
-        setTimeout(() => setCopyHint(null), 2000);
-      }
+      setShareHint('Não foi possível abrir a partilha');
+      setTimeout(() => setShareHint(null), 2000);
     }
+  }
+
+  function handleShareWhatsApp() {
+    if (!detail || !inviteUrl) return;
+    const text = `Entra na lista "${detail.name}" no ShopShare: ${inviteUrl}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+  }
+
+  function handleShareEmail() {
+    if (!detail || !inviteUrl) return;
+    const subject = `Convite para a lista ${detail.name}`;
+    const body = `Olá!\n\nEntra na minha lista "${detail.name}" no ShopShare:\n${inviteUrl}\n\nAté já!`;
+    window.open(
+      `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
   }
 
   async function handleToggleItem(item: ListItemDto, next: boolean) {
@@ -1097,6 +1124,130 @@ export function ListDetailPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {shareModalOpen && detail ? (
+        <div
+          className="fixed inset-0 z-[102] flex items-center justify-center bg-[color-mix(in_srgb,var(--color-on-background)_40%,transparent)] p-4 backdrop-blur-sm dark:bg-black/45"
+          role="presentation"
+          onClick={() => setShareModalOpen(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal
+            aria-labelledby="share-list-title"
+            className="w-full max-w-lg overflow-hidden rounded-xl border border-outline-variant/20 bg-surface-container-lowest shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-8 pb-4 pt-8">
+              <h2
+                id="share-list-title"
+                className="font-headline text-2xl font-extrabold tracking-tight text-on-surface"
+              >
+                Compartilhar Lista
+              </h2>
+              <button
+                type="button"
+                className="flex h-10 w-10 items-center justify-center rounded-full text-outline transition-colors hover:bg-surface-container-low"
+                onClick={() => setShareModalOpen(false)}
+                aria-label="Fechar"
+              >
+                <span className="material-symbols-outlined" aria-hidden>
+                  close
+                </span>
+              </button>
+            </div>
+            <div className="px-8 pb-10">
+              <p className="mb-6 font-medium leading-relaxed text-on-surface-variant">
+                Envie este link para amigos ou familiares para que eles possam visualizar e editar
+                esta lista com você.
+              </p>
+              <div className="mb-6 flex flex-col items-center gap-3 sm:flex-row">
+                <div className="relative w-full flex-grow">
+                  <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
+                    <span className="material-symbols-outlined text-sm text-outline" aria-hidden>
+                      link
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    readOnly
+                    value={inviteUrl}
+                    className="w-full rounded-full border-0 bg-surface-container-low py-4 pl-12 pr-4 font-medium text-on-surface focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void handleCopyInviteLink()}
+                  className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-primary px-8 py-4 font-bold text-on-primary shadow-lg shadow-primary/20 transition-all active:scale-95 hover:bg-primary-dim sm:w-auto"
+                >
+                  <span className="material-symbols-outlined text-sm" aria-hidden>
+                    content_copy
+                  </span>
+                  Copiar Link
+                </button>
+              </div>
+              {shareHint ? (
+                <p className="mb-4 text-sm font-medium text-primary" role="status">
+                  {shareHint}
+                </p>
+              ) : null}
+              <div className="flex items-start gap-3 rounded-xl border border-surface-container bg-surface-container-low p-4">
+                <span className="material-symbols-outlined mt-0.5 text-primary-dim" aria-hidden>
+                  info
+                </span>
+                <p className="text-sm leading-relaxed text-on-surface-variant">
+                  <strong className="text-on-surface">Importante:</strong> Quem tiver este link
+                  poderá entrar na lista instantaneamente e fazer alterações em tempo real.
+                </p>
+              </div>
+              <div className="mt-8">
+                <p className="mb-4 text-xs font-bold uppercase tracking-widest text-outline">
+                  Ou compartilhe via
+                </p>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={handleShareWhatsApp}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-full border border-surface-container-highest py-3 font-semibold text-on-surface transition-colors hover:bg-surface-container-low"
+                  >
+                    <svg
+                      className="h-5 w-5 text-[#25D366]"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden
+                    >
+                      <path d="M20.52 3.48A11.8 11.8 0 0 0 12.03 0C5.41 0 .03 5.36.03 11.97c0 2.11.55 4.18 1.59 6L0 24l6.22-1.62a11.95 11.95 0 0 0 5.81 1.49h.01c6.61 0 11.99-5.36 11.99-11.97 0-3.2-1.25-6.2-3.51-8.42Zm-8.48 18.36h-.01a9.9 9.9 0 0 1-5.05-1.38l-.36-.22-3.69.96.99-3.6-.24-.37a9.89 9.89 0 0 1-1.52-5.26c0-5.47 4.45-9.92 9.93-9.92 2.65 0 5.14 1.03 7.01 2.9a9.86 9.86 0 0 1 2.9 7.01c0 5.47-4.45 9.92-9.93 9.92Zm5.44-7.41c-.3-.15-1.77-.87-2.05-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.25-.46-2.38-1.46-.88-.79-1.47-1.77-1.64-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.87 1.22 3.06.15.2 2.1 3.21 5.09 4.5.71.31 1.27.49 1.7.63.72.23 1.37.2 1.89.12.58-.09 1.77-.72 2.02-1.41.25-.7.25-1.29.17-1.42-.08-.12-.27-.2-.57-.35Z" />
+                    </svg>
+                    WhatsApp
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleShareEmail}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-full border border-surface-container-highest py-3 font-semibold text-on-surface transition-colors hover:bg-surface-container-low"
+                  >
+                    <span className="material-symbols-outlined text-blue-500" aria-hidden>
+                      mail
+                    </span>
+                    E-mail
+                  </button>
+                </div>
+                {navigator.share ? (
+                  <button
+                    type="button"
+                    onClick={() => void handleShareViaSystem()}
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-primary/20 py-3 font-semibold text-primary transition-colors hover:bg-primary/5"
+                  >
+                    <span className="material-symbols-outlined text-[18px]" aria-hidden>
+                      ios_share
+                    </span>
+                    Mais opções do dispositivo
+                  </button>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
